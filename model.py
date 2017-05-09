@@ -23,6 +23,7 @@ class User(db.Model):
     email = db.Column(db.String(254), nullable=True, unique=True)
     password = db.Column(db.String(80), nullable=False)
 
+    #Define association table relationships
     ingredients = db.relationship("Ingredient", secondary="user_ingredients",
                                     backref="users")
     recipes = db.relationship("Recipe", secondary="user_recipes",
@@ -56,11 +57,11 @@ class Recipe(db.Model):
 
     recipe_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
-    # all_ingredients = db.Column(db.Array, nullable=False) #not sure???? or use db.Column(db.PickleType(mutable=True))?
     instructions = db.Column(db.Text, nullable=False)
     url = db.Column(db.Text, nullable=False)
     cooked = db.Column(db.Boolean)
 
+    #Define association relationship with ingredient
     ingredients = db.relationship("Ingredient", secondary="recipe_ingredients", 
                                     backref="recipes")
 
@@ -97,7 +98,6 @@ class UserIngredient(db.Model):
                                                                             self.user_ingred_id, 
                                                                             self.user_id,
                                                                             self.ingredient.ingred_name)
-
 
 class UserRecipe(db.Model):
     """Recipes for each user"""

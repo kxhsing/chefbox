@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+  <title>{% block title %} title {% endblock %}</title>
+</head>
+
+<body>
+
+  <!-- Show flashed messages -->
+  {% with messages = get_flashed_messages() %}
+      {% for message in messages %}
+          <div class="alert alert-warning">{{ message }}</div>
+      {% endfor %}
+  {% endwith %}
+
+
+  {% if 'user_id' in session %}
+    <a href="/logout"> Log Out </a>
+  {% endif %}
+
+
+
+  {% block content %} put your content here {% endblock %}
+
+</body>
+</html>
