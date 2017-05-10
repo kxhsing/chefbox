@@ -12,6 +12,8 @@ import requests
 
 import os
 
+import json
+
 
 app = Flask(__name__)
 
@@ -191,9 +193,11 @@ def request_recipe():
                 'includeIngredients': include_ingredients
             }
 
-    r = requests.get(search_recipe_complex, headers=headers, params=payload)
-    r = r.json()
-    print r
+    recipes = requests.get(search_recipe_complex, headers=headers, params=payload)
+    recipes = recipes.json()
+    # print recipes
+    recipe_formatted = json.dumps(recipes, indent=4, sort_keys=True)
+    print recipe_formatted
 
     return redirect('/search_recipe')
 
