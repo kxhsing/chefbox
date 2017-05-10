@@ -3,3 +3,4 @@ env/
 .DS_Store
 spoonacular-response-examples/
 project-flow.txt
+secrets.sh

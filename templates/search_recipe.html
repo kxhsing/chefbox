@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Recipe{% endblock %}
+
+{% block content %}
+
+    <h2>Search for a Recipe</h2>
+    {% if user.ingredients %}
+      <p>Use my inventory of ingredients:</p>
+      <form action="/search_recipe" method="POST">
+          {% for ingredient in user.ingredients %}
+              <li><input type="checkbox" name="search_ingredients" value="{{ ingredient.ingred_name }}" checked>{{ ingredient.ingred_name }}</li>
+          {% endfor %}
+        </ul>
+        <br>
+        <input type="submit">
+        </form>
+    {% endif %}
+
+
+    <p>Forget something? Add an ingredient:</p>
+      <form action="/add_ingred" method="POST">
+        <input type="text" name="ingredient">
+        <input type="submit" value="Add">
+      </form>
+
+
+
+
+
+
+
+
+{% endblock %}
+
+
+
+

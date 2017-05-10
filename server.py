@@ -8,6 +8,10 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 from model import User, Recipe, Ingredient, RecipeIngredient, UserIngredient, UserRecipe, Review, connect_to_db, db
 
+import requests
+
+import os
+
 
 app = Flask(__name__)
 
@@ -19,6 +23,21 @@ app.secret_key = "secretsecretsecrets"
 # error.
 app.jinja_env.undefined = StrictUndefined
 
+
+#####SPOONACULAR ENDPOINTS - all GET requests
+search_recipe_complex = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/searchComplex"
+auto_complete_ingred = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/food/ingredients/autocomplete"
+get_recipe_info = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/{id}/information"
+
+YOURKEY = os.environ['YOURKEY']
+
+headers={
+    "X-Mashape-Key": YOURKEY,
+    "Accept": "application/json"
+  }
+
+
+#####
 
 @app.route('/')
 def index():
@@ -33,7 +52,6 @@ def register_form():
     """Registration for new user."""
 
     return render_template("register_form.html")
-
 
 
 # After user registers
@@ -92,7 +110,7 @@ def logout():
 
 
 @app.route('/users/<user_id>')
-def user_info(user_id):
+def show_user_info(user_id):
     """Show user's dashboard, which houses linkes to saved recipes and ingredients"""
 
     user = User.query.filter(User.user_id==user_id).one()
@@ -101,25 +119,89 @@ def user_info(user_id):
 
 
 @app.route('/recipes/<user_id>')
-def user_recipes(user_id):
+def show_user_recipes(user_id):
     """Show user's saved recipes"""
     pass
 
 
 @app.route('/ingred/<user_id>')
-def user_recipes(user_id):
+def show_user_ingredients(user_id):
     """Show user's ingredients"""
-    pass
+    
+    user_id = session.get("user_id")
+    user = User.query.filter(User.user_id==user_id).one()
+
+    return render_template("user_ingred.html", user=user)
 
 
-@app.route('/add_ingred')
+@app.route('/add_ingred', methods=["POST"])
 def add_ingred():
-    pass
+    """Add ingredient to user's inventory and master inventory if not already
+    in the database"""
+
+    user_id = session.get("user_id")
+    user = User.query.filter(User.user_id==user_id).one()
+    ingredient = request.form.get("ingredient").lower()
+
+    if UserIngredient.query.filter(Ingredient.ingred_name==ingredient).all():
+        flash("Ingredient already exists.")
+        return redirect("/ingred/"+str(user_id))
+
+    if not Ingredient.query.filter(Ingredient.ingred_name==ingredient).all():
+        new_ingred = Ingredient(ingred_name=ingredient)
+        db.session.add(new_ingred)
+        db.session.commit()
+        new_user_ingred = UserIngredient(ingred_id=new_ingred.ingred_id, user_id=user.user_id) 
+    else:
+        ingred_id = Ingredient.query.filter(Ingredient.ingred_name==ingredient).one().ingred_id
+        new_user_ingred = UserIngredient(ingred_id=ingred_id, user_id=user.user_id) 
+
+
+    db.session.add(new_user_ingred)
+    db.session.commit()
+
+    flash ("Added to inventory: "+ingredient)
+
+    return redirect("/ingred/"+str(user_id))
 
 
 @app.route('/search_recipe')
 def search_recipe():
+    """Search recipe page"""
+
+    user_id = session.get("user_id")
+    user = User.query.filter(User.user_id==user_id).one()
+
+    return render_template("search_recipe.html", user=user)
+
+
+@app.route('/search_recipe', methods=["POST"])
+def request_recipe():
+    """GET request for recipes"""
+
+    user_id = session.get("user_id")
+    user = User.query.filter(User.user_id==user_id).one()
+
+    include_ingredients = request.form.getlist('search_ingredients')
+    print include_ingredients
+
+
+    payload = {
+                'addRecipeInformation': False, 
+                'includeIngredients': include_ingredients
+            }
+
+    r = requests.get(search_recipe_complex, headers=headers, params=payload)
+    r = r.json()
+    print r
+
+    return redirect('/search_recipe')
+
+
+@app.route('/recipe_results')
+def display_recipes():
     pass
+
 
 
 @app.route('/add_recipe')

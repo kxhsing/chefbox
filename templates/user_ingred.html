@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Ingredient Inventory{% endblock %}
+
+{% block content %}
+
+    <h2>Ingredient Inventory</h2>
+    {% if user.ingredients %}
+    <ul>
+    {% for ingredient in user.ingredients %}
+        <li>{{ ingredient.ingred_name }}</li>
+    {% endfor %}
+      </ul>
+    {% endif %}
+
+
+    <h3>Add Ingredient</h3>
+      <form action="/add_ingred" method="POST">
+        <input type="text" name="ingredient">
+        <input type="submit" value="Add">
+      </form>
+
+
+
+
+
+
+{% endblock %}
