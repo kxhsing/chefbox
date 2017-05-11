@@ -4,3 +4,5 @@ env/
 spoonacular-response-examples/
 project-flow.txt
 secrets.sh
+reciperesults-parsing.py
+*.json

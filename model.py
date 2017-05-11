@@ -94,10 +94,9 @@ class UserIngredient(db.Model):
 
     def __repr__(self):
         """Provide helpful representation when printed."""
-        return "<UserIngredient user_ingred_id={} user_id={} ingred_name={}>".format(
-                                                                            self.user_ingred_id, 
-                                                                            self.user_id,
-                                                                            self.ingredient.ingred_name)
+        return "<UserIngredient user_ingred_id={} user_id={}>".format(self.user_ingred_id, 
+                                                                        self.user_id)
+
 
 class UserRecipe(db.Model):
     """Recipes for each user"""

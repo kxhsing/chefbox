@@ -6,16 +6,43 @@
 
     <h2>Search for a Recipe</h2>
     {% if user.ingredients %}
-      <p>Use my inventory of ingredients:</p>
+      <p>Include Ingredients from Inventory:</p>
       <form action="/search_recipe" method="POST">
+        <ul>
           {% for ingredient in user.ingredients %}
               <li><input type="checkbox" name="search_ingredients" value="{{ ingredient.ingred_name }}" checked>{{ ingredient.ingred_name }}</li>
           {% endfor %}
         </ul>
-        <br>
-        <input type="submit">
+        {% endif %}<br>
+
+          Preferred Cuisine(s)<br>
+          (optional):<br>
+            <ul>
+            {% for cuisine in cuisines %}
+                <li><input type="checkbox" name="cuisines" value="{{ cuisine }}">{{ cuisine }}</li>
+            {% endfor %}
+            </ul><br>
+
+
+          Dietary Restrictions: 
+          <select name="diet">
+            <option value="">None</option><br>
+            {% for diet in diets %}
+            <option value="{{ diet }}">{{ diet }}</option><br>
+            {% endfor %}
+          </select><br>
+
+          <p></p>
+
+          Allergies or Intolerances: 
+            <ul>
+            {% for intolerance in intolerances %}
+                <li><input type="checkbox" name="intolerances" value="{{ intolerance }}">{{ intolerance }}</li>
+            {% endfor %}
+            </ul><br>
+        <input type="submit" value="Search">
         </form>
-    {% endif %}
+
 
 
     <p>Forget something? Add an ingredient:</p>

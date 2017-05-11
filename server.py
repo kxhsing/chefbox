@@ -145,24 +145,29 @@ def add_ingred():
     user = User.query.filter(User.user_id==user_id).one()
     ingredient = request.form.get("ingredient").lower()
 
-    if UserIngredient.query.filter(Ingredient.ingred_name==ingredient).all():
-        flash("Ingredient already exists.")
+    #Check if ingredient is in master list is in user's inventory
+    if Ingredient.query.filter(Ingredient.ingred_name==ingredient).all():
+        ingredient_id = Ingredient.query.filter(Ingredient.ingred_name==ingredient).one().ingred_id
+        if UserIngredient.query.filter(UserIngredient.user_id==user_id, UserIngredient.ingred_id==ingredient_id,).all():
+            flash("Ingredient already exists in your inventory.")  
+        else:
+            new_user_ingred = UserIngredient(ingred_id=ingredient_id, user_id=user.user_id) 
+            db.session.add(new_user_ingred)
+            db.session.commit()
+            flash ("Added to inventory: "+ingredient)
         return redirect("/ingred/"+str(user_id))
 
-    if not Ingredient.query.filter(Ingredient.ingred_name==ingredient).all():
+    #If ingredient not in master ingredient list, add to master ingredients
+    #and also add to user's ingredient inventory
+    else:
         new_ingred = Ingredient(ingred_name=ingredient)
         db.session.add(new_ingred)
         db.session.commit()
-        new_user_ingred = UserIngredient(ingred_id=new_ingred.ingred_id, user_id=user.user_id) 
-    else:
-        ingred_id = Ingredient.query.filter(Ingredient.ingred_name==ingredient).one().ingred_id
-        new_user_ingred = UserIngredient(ingred_id=ingred_id, user_id=user.user_id) 
+        new_user_ingred = UserIngredient(ingred_id=new_ingred.ingred_id, user_id=user.user_id)
+        db.session.add(new_user_ingred)
+        db.session.commit()
+        flash ("Added to inventory: "+ingredient) 
 
-
-    db.session.add(new_user_ingred)
-    db.session.commit()
-
-    flash ("Added to inventory: "+ingredient)
 
     return redirect("/ingred/"+str(user_id))
 
@@ -174,7 +179,18 @@ def search_recipe():
     user_id = session.get("user_id")
     user = User.query.filter(User.user_id==user_id).one()
 
-    return render_template("search_recipe.html", user=user)
+    #Spoonacular recipe search parameters
+    cuisines = ["african", "chinese", "japanese", "korean", "vietnamese", "thai", "indian", "british", "irish", "french", "italian", "mexican", "spanish", "middle eastern", "jewish", "american", "cajun", "southern", "greek", "german", "nordic", "eastern european", "caribbean", "latin american"]
+    diets = ["pescetarian", "lacto vegetarian", "ovo vegetarian", "vegan", "paleo", "primal", "vegetarian"]
+    intolerances = ["dairy", "egg", "gluten", "peanut", "sesame", "seafood", "shellfish", "soy", "sulfite", "tree nut", "wheat"]
+    types = ["main course", "side dish", "dessert", "appetizer", "salad", "bread", "breakfast", "soup", "beverage", "sauce", "drink"]
+
+    return render_template("search_recipe.html", 
+                            user=user, 
+                            cuisines=cuisines, 
+                            diets=diets, 
+                            intolerances=intolerances, 
+                            types=types)
 
 
 @app.route('/search_recipe', methods=["POST"])
@@ -187,19 +203,63 @@ def request_recipe():
     include_ingredients = request.form.getlist('search_ingredients')
     print include_ingredients
 
+    cuisines = request.form.getlist('cuisines')
+    print cuisines
+
+    intolerances = request.form.getlist('intolerances')
+    print intolerances
+
+    diet = request.form.get('diet')
+    print diet
 
     payload = {
-                'addRecipeInformation': False, 
-                'includeIngredients': include_ingredients
+                'addRecipeInformation': True, 
+                'includeIngredients': include_ingredients,
+                'instructionsRequired': True,
+                'diet': diet,
+                'cuisine': cuisines,
+                'intolerances': intolerances,
+                'ranking': 1,
             }
 
     recipes = requests.get(search_recipe_complex, headers=headers, params=payload)
     recipes = recipes.json()
-    # print recipes
-    recipe_formatted = json.dumps(recipes, indent=4, sort_keys=True)
-    print recipe_formatted
 
-    return redirect('/search_recipe')
+    recipe_formatted = json.dumps(recipes, indent=4, sort_keys=True) #formatting the responses nicely in terminal
+    print recipe_formatted #view formatted response in terminal
+
+    recipe_results_list = [] #list of recipes to pass to recipe_results.html
+
+    for recipe in recipe_results: #fetch each recipe to do stuff
+
+        recipe_id = recipe['id']
+        recipe_title = recipe['title']
+        recipe_source_name = recipe['sourceName']
+        recipe_source_url = recipe['sourceUrl']
+        recipe_img = recipe['image']
+
+        steps = recipe['analyzedInstructions'][0]['steps']
+
+        step_instructions = [] #create list for all instruction steps
+        for step in steps:
+            step_instructions.append(step['step'])
+
+        all_ingred_info = [] #create list to store all ingredient info, incl. id, name
+        for step in steps:
+            all_ingred_info.append(step['ingredients'])
+
+        ingredient_names = set() #create set of ingredient names for each recipe
+        for ingredient_list in all_ingred_info:
+            for ingredient in ingredient_list:
+                ingredient_names.add(ingredient['name'])
+
+        ingredient_names = list(ingredient_names)
+        #master list of info with id, title, name, source, image, for each recipe
+        recipe_info = [recipe_id, recipe_title, recipe_source_name, recipe_source_url, recipe_img, step_instructions, ingredient_names]
+        recipe_results_list.append(recipe_info) 
+    
+
+    return render_template("recipe_results.html", user=user, recipe_results=recipe_results_list)
 
 
 @app.route('/recipe_results')
