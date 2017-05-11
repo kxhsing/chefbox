@@ -9,6 +9,9 @@
     <ul>
     {% for ingredient in user.ingredients %}
         <li>{{ ingredient.ingred_name }}</li>
+        <form action="/del_ingred" method="post">
+          <button type="submit" name="ingredient" value="{{ ingredient.ingred_id }}" class="btn-link">x</button>
+        </form>
     {% endfor %}
       </ul>
     {% endif %}

@@ -149,7 +149,7 @@ def add_ingred():
     if Ingredient.query.filter(Ingredient.ingred_name==ingredient).all():
         ingredient_id = Ingredient.query.filter(Ingredient.ingred_name==ingredient).one().ingred_id
         if UserIngredient.query.filter(UserIngredient.user_id==user_id, UserIngredient.ingred_id==ingredient_id,).all():
-            flash("Ingredient already exists in your inventory.")  
+            flash(ingredient.title()+" already exists in your inventory.")  
         else:
             new_user_ingred = UserIngredient(ingred_id=ingredient_id, user_id=user.user_id) 
             db.session.add(new_user_ingred)
@@ -168,6 +168,21 @@ def add_ingred():
         db.session.commit()
         flash ("Added to inventory: "+ingredient) 
 
+    return redirect("/ingred/"+str(user_id))
+
+
+@app.route('/del_ingred', methods=['POST'])
+def delete_ingred():
+    """Delete ingredient from user's ingredient inventory"""
+
+    user_id = session.get("user_id")
+    user = User.query.filter(User.user_id==user_id).one()
+    ingred_id = request.form.get("ingredient")
+
+    ingred_to_del = UserIngredient.query.filter(UserIngredient.ingred_id==ingred_id, UserIngredient.user_id==user.user_id).one() 
+    db.session.delete(ingred_to_del)
+    db.session.commit()
+    flash ("Ingredient removed.") 
 
     return redirect("/ingred/"+str(user_id))
 
