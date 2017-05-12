@@ -1,31 +1,66 @@
 {% extends 'base.html' %}
 
-{% block title %}Search Recipe{% endblock %}
+{% block title %}Recipe Results{% endblock %}
 
 {% block content %}
 
     <h2>Recipe Results</h2>
-    {% if user.ingredients %}
-      <p>Use my inventory of ingredients:</p>
-      <form action="/search_recipe" method="POST">
-          {% for ingredient in user.ingredients %}
-              <li><input type="checkbox" name="search_ingredients" value="{{ ingredient.ingred_name }}" checked>{{ ingredient.ingred_name }}</li>
-          {% endfor %}
-        </ul>
-        <br>
-        <input type="submit">
-        </form>
+
+    {% if recipe_results_list %}
+      <p>Save a recipe to import it into your recipe box. <br>
+        Saved recipes will include recipe name, ingredients, ingredient units and measurements, instructions, and source URL.</p>
+          {% for recipe in recipe_results_list %}
+            <table>
+                  <tr>
+                    <th>{{ recipe[1].title() }}</th>
+                  </tr>
+                    <tr>
+                      <td> <img src="{{ recipe[4] }}"> </td>
+                    </tr>
+                    <tr>
+                      <td> via {% if recipe[3] and recipe[2] %}<a href="{{ recipe[3]}}"> {{ recipe[2] }} </a> 
+                              {% elif recipe[3] %}
+                                <a href="{{ recipe[3]}}"> [Original Source] </a> 
+                              {% else %} 
+                                {{ recipe[2] }}
+                              {% endif %}
+                          </td>
+                    </tr>
+                    <tr>
+                      <td>Ingredients<br>
+                        <ul>
+                        {% for ingredient in recipe[6] %}
+                            <li>{{ ingredient.title() }}</li>
+                        {% endfor %}
+                      </ul>
+                      </td>
+                    </tr>
+                      <tr>
+                        <td>Instructions<br>
+                          <ol>
+                          {% for instruction in recipe[5] %}
+                              <li>{{ instruction }}</li>
+                          {% endfor %}
+                        </ol>
+                        </td>
+                      </tr>
+                    <tr>
+                      <td>
+                      <form action="/add_recipe" method="POST">
+                            <button type="submit" name="recipe_id" value="{{ recipe[0] }}">Save Recipe</button>
+                      </form>
+                      </td>
+                    </tr>
+              </table>
+              <p></p>
+            {% endfor %}
+
+    {% else %}
+      <p>We couldn't find a recipe with the parameters you specified. Please try again.</p>
+
     {% endif %}
 
-
-    <p>Forget something? Add an ingredient:</p>
-      <form action="/add_ingred" method="POST">
-        <input type="text" name="ingredient">
-        <input type="submit" value="Add">
-      </form>
-
-
-
+  <p><a href="/search_recipe">Search for more recipes</a></p>
 
 
 

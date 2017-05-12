@@ -20,7 +20,7 @@ class User(db.Model):
     user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     firstname = db.Column(db.String(50), nullable=False)
     lastname = db.Column(db.String(50), nullable=True)
-    email = db.Column(db.String(254), nullable=True, unique=True)
+    email = db.Column(db.String(254), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
 
     #Define association table relationships
@@ -58,7 +58,7 @@ class Recipe(db.Model):
     recipe_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     instructions = db.Column(db.Text, nullable=False)
-    url = db.Column(db.Text, nullable=False)
+    url = db.Column(db.Text, nullable=True)
     cooked = db.Column(db.Boolean)
 
     #Define association relationship with ingredient
@@ -162,4 +162,5 @@ if __name__ == "__main__":
 
     from server import app
     connect_to_db(app)
+    
     print "Connected to DB."

@@ -10,7 +10,7 @@
       <form action="/search_recipe" method="POST">
         <ul>
           {% for ingredient in user.ingredients %}
-              <li><input type="checkbox" name="search_ingredients" value="{{ ingredient.ingred_name }}" checked>{{ ingredient.ingred_name }}</li>
+              <li><input type="checkbox" name="search_ingredients" value="{{ ingredient.ingred_name }}" checked>{{ ingredient.ingred_name.title() }}</li>
           {% endfor %}
         </ul>
         {% endif %}<br>
@@ -19,7 +19,7 @@
           (optional):<br>
             <ul>
             {% for cuisine in cuisines %}
-                <li><input type="checkbox" name="cuisines" value="{{ cuisine }}">{{ cuisine }}</li>
+                <li><input type="checkbox" name="cuisines" value="{{ cuisine }}">{{ cuisine.title() }}</li>
             {% endfor %}
             </ul><br>
 
@@ -28,7 +28,7 @@
           <select name="diet">
             <option value="">None</option><br>
             {% for diet in diets %}
-            <option value="{{ diet }}">{{ diet }}</option><br>
+            <option value="{{ diet }}">{{ diet.title() }}</option><br>
             {% endfor %}
           </select><br>
 
@@ -37,7 +37,7 @@
           Allergies or Intolerances: 
             <ul>
             {% for intolerance in intolerances %}
-                <li><input type="checkbox" name="intolerances" value="{{ intolerance }}">{{ intolerance }}</li>
+                <li><input type="checkbox" name="intolerances" value="{{ intolerance }}">{{ intolerance.title() }}</li>
             {% endfor %}
             </ul><br>
         <input type="submit" value="Search">

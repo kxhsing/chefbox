@@ -8,9 +8,9 @@
     {% if user.ingredients %}
     <ul>
     {% for ingredient in user.ingredients %}
-        <li>{{ ingredient.ingred_name }}</li>
+        <li>{{ ingredient.ingred_name.title() }}</li>
         <form action="/del_ingred" method="post">
-          <button type="submit" name="ingredient" value="{{ ingredient.ingred_id }}" class="btn-link">x</button>
+          <button type="submit" name="ingredient" value="{{ ingredient.ingred_id }}">x</button>
         </form>
     {% endfor %}
       </ul>

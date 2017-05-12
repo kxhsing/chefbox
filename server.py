@@ -28,8 +28,9 @@ app.jinja_env.undefined = StrictUndefined
 
 #####SPOONACULAR ENDPOINTS - all GET requests
 search_recipe_complex = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/searchComplex"
+get_recipe_info = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/{}/information"
+bulk_recipe_info = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/informationBulk"
 auto_complete_ingred = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/food/ingredients/autocomplete"
-get_recipe_info = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/{id}/information"
 
 YOURKEY = os.environ['YOURKEY']
 
@@ -62,7 +63,7 @@ def register_complete():
     """After user registers, adds to db and goes back to homepage."""
     firstname = request.form.get("firstname")
     lastname = request.form.get("lastname")
-    email = request.form.get("email")
+    email = request.form.get("email").lower()
     password = request.form.get("password")
 
     if not User.query.filter(User.email==email).all():
@@ -123,7 +124,11 @@ def show_user_info(user_id):
 @app.route('/recipes/<user_id>')
 def show_user_recipes(user_id):
     """Show user's saved recipes"""
-    pass
+
+    user_id = session.get("user_id")
+    user = User.query.filter(User.user_id==user_id).one()
+
+    return render_template("user_recipes.html", user=user)
 
 
 @app.route('/ingred/<user_id>')
@@ -148,13 +153,13 @@ def add_ingred():
     #Check if ingredient is in master list is in user's inventory
     if Ingredient.query.filter(Ingredient.ingred_name==ingredient).all():
         ingredient_id = Ingredient.query.filter(Ingredient.ingred_name==ingredient).one().ingred_id
-        if UserIngredient.query.filter(UserIngredient.user_id==user_id, UserIngredient.ingred_id==ingredient_id,).all():
+        if UserIngredient.query.filter(UserIngredient.user_id==user_id, UserIngredient.ingred_id==ingredient_id).all():
             flash(ingredient.title()+" already exists in your inventory.")  
         else:
             new_user_ingred = UserIngredient(ingred_id=ingredient_id, user_id=user.user_id) 
             db.session.add(new_user_ingred)
             db.session.commit()
-            flash ("Added to inventory: "+ingredient)
+            flash ("Added to inventory: "+ingredient.title())
         return redirect("/ingred/"+str(user_id))
 
     #If ingredient not in master ingredient list, add to master ingredients
@@ -198,7 +203,7 @@ def search_recipe():
     cuisines = ["african", "chinese", "japanese", "korean", "vietnamese", "thai", "indian", "british", "irish", "french", "italian", "mexican", "spanish", "middle eastern", "jewish", "american", "cajun", "southern", "greek", "german", "nordic", "eastern european", "caribbean", "latin american"]
     diets = ["pescetarian", "lacto vegetarian", "ovo vegetarian", "vegan", "paleo", "primal", "vegetarian"]
     intolerances = ["dairy", "egg", "gluten", "peanut", "sesame", "seafood", "shellfish", "soy", "sulfite", "tree nut", "wheat"]
-    types = ["main course", "side dish", "dessert", "appetizer", "salad", "bread", "breakfast", "soup", "beverage", "sauce", "drink"]
+    types = ["main course", "side dish", "dessert", "appetizer", "salad", "bread", "breakfast", "soup", "beverage", "sauce", "drink"] #not sure if going to keep this, seems to really limit search results
 
     return render_template("search_recipe.html", 
                             user=user, 
@@ -216,19 +221,19 @@ def request_recipe():
     user = User.query.filter(User.user_id==user_id).one()
 
     include_ingredients = request.form.getlist('search_ingredients')
-    print include_ingredients
+    # print include_ingredients
 
     cuisines = request.form.getlist('cuisines')
-    print cuisines
+    # print cuisines
 
     intolerances = request.form.getlist('intolerances')
-    print intolerances
+    # print intolerances
 
     diet = request.form.get('diet')
     print diet
 
     payload = {
-                'addRecipeInformation': True, 
+                'addRecipeInformation': True, #will need to change this to false once data is organized to complex search -> bulk -> display results
                 'includeIngredients': include_ingredients,
                 'instructionsRequired': True,
                 'diet': diet,
@@ -245,12 +250,13 @@ def request_recipe():
 
     recipe_results_list = [] #list of recipes to pass to recipe_results.html
 
+    recipe_results = recipes['results']
     for recipe in recipe_results: #fetch each recipe to do stuff
 
         recipe_id = recipe['id']
         recipe_title = recipe['title']
-        recipe_source_name = recipe['sourceName']
-        recipe_source_url = recipe['sourceUrl']
+        recipe_source_name = recipe.get('sourceName')
+        recipe_source_url = recipe.get('sourceUrl')
         recipe_img = recipe['image']
 
         steps = recipe['analyzedInstructions'][0]['steps']
@@ -272,20 +278,27 @@ def request_recipe():
         #master list of info with id, title, name, source, image, for each recipe
         recipe_info = [recipe_id, recipe_title, recipe_source_name, recipe_source_url, recipe_img, step_instructions, ingredient_names]
         recipe_results_list.append(recipe_info) 
+
+    # print recipe_results_list
     
-
-    return render_template("recipe_results.html", user=user, recipe_results=recipe_results_list)
-
-
-@app.route('/recipe_results')
-def display_recipes():
-    pass
+    return render_template("recipe_results.html", user=user, recipe_results_list=recipe_results_list)
 
 
-
-@app.route('/add_recipe')
+@app.route('/add_recipe', methods=["POST"])
 def add_recipe():
-    pass
+    user_id = session.get("user_id")
+    user = User.query.filter(User.user_id==user_id).one()
+
+    recipe_id = request.form.get('recipe_id')
+    print recipe_id
+
+    # recipe = requests.get(get_recipe_info.format(id=recipe_id), headers=headers)
+    # recipe = requests.get("https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/{}/information".format(recipe_id), headers=headers)
+    recipe = requests.get(get_recipe_info.format(recipe_id), headers=headers)
+    recipe = recipe.json()
+    print recipe
+    
+    return redirect('/search_recipe')
 
 
 if __name__ == "__main__":
