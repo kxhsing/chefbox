@@ -233,7 +233,7 @@ def request_recipe():
     print diet
 
     payload = {
-                'addRecipeInformation': True, #will need to change this to false once data is organized to complex search -> bulk -> display results
+                'addRecipeInformation': False, 
                 'includeIngredients': include_ingredients,
                 'instructionsRequired': True,
                 'diet': diet,
@@ -250,36 +250,55 @@ def request_recipe():
 
     recipe_results_list = [] #list of recipes to pass to recipe_results.html
 
-    recipe_results = recipes['results']
-    for recipe in recipe_results: #fetch each recipe to do stuff
+    recipe_results = recipes['results'] 
+    # print recipe_results
 
+    recipe_ids = []
+
+    for recipe in recipe_results: #fetch each recipe id, add to id list and run in "Get Bulk Recipe Info" endpoint
+        recipe_id = str(recipe['id'])
+        recipe_ids.append(recipe_id)
+
+    recipe_ids_bulk = ','.join(recipe_ids)
+    print recipe_ids_bulk
+
+    bulk_recipe_results = requests.get(bulk_recipe_info, headers=headers, params={'ids': recipe_ids_bulk}) #something wrong here
+    print bulk_recipe_results
+
+    bulk_recipe_results = bulk_recipe_results.json()
+
+    print bulk_recipe_results
+
+    for recipe in bulk_recipe_results:
         recipe_id = recipe['id']
         recipe_title = recipe['title']
-        recipe_source_name = recipe.get('sourceName')
-        recipe_source_url = recipe.get('sourceUrl')
+        recipe_source_name = recipe['sourceName']
+        recipe_source_url = recipe['sourceUrl']
         recipe_img = recipe['image']
 
         steps = recipe['analyzedInstructions'][0]['steps']
-
         step_instructions = [] #create list for all instruction steps
+
         for step in steps:
             step_instructions.append(step['step'])
 
-        all_ingred_info = [] #create list to store all ingredient info, incl. id, name
-        for step in steps:
-            all_ingred_info.append(step['ingredients'])
+        ingredients = recipe['extendedIngredients'] # list of dictionaries. each dict contains info about all ingredients, including 'name', 'amount', 'unit'
 
-        ingredient_names = set() #create set of ingredient names for each recipe
-        for ingredient_list in all_ingred_info:
-            for ingredient in ingredient_list:
-                ingredient_names.add(ingredient['name'])
+        ingredient_names_amt = []
+        for ingredient in ingredients:
+            ingredient_name = ingredient['name'].title()
+            ingredient_amt = str(ingredient['amount'])+" "
+            ingredient_unit = ingredient['unitShort'].lower()+" - "
+            ingredient_final = ingredient_amt + ingredient_unit + ingredient_name
+            ingredient_names_amt.append(ingredient_final)
 
-        ingredient_names = list(ingredient_names)
+
         #master list of info with id, title, name, source, image, for each recipe
-        recipe_info = [recipe_id, recipe_title, recipe_source_name, recipe_source_url, recipe_img, step_instructions, ingredient_names]
+        recipe_info = [recipe_id, recipe_title, recipe_source_name, recipe_source_url, recipe_img, step_instructions, ingredient_names_amt]
         recipe_results_list.append(recipe_info) 
 
-    # print recipe_results_list
+    print recipe_results_list
+
     
     return render_template("recipe_results.html", user=user, recipe_results_list=recipe_results_list)
 
