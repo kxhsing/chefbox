@@ -363,17 +363,15 @@ def add_recipe():
             db.session.commit()
 
 
-    existing_recipe_recipe_id = Recipe.query.filter(Recipe.url==saved_recipe_source_url).one().url
+    existing_recipe_id = Recipe.query.filter(Recipe.url==saved_recipe_source_url).one().recipe_id
 
-
-    if not UserRecipe.query.filter(UserRecipe.user_id=user_id, UserRecipe.recipe_id).all():
+    if not UserRecipe.query.filter(UserRecipe.user_id==user_id, UserRecipe.recipe_id==existing_recipe_id).all():
         new_user_recipe = UserRecipe(recipe_id=existing_recipe_id, user_id=user_id)
         db.session.add(new_user_recipe)
         db.session.commit()
 
         print new_user_recipe
-        print new_recipe_ingred
-        print new_recipe
+
     
     return redirect('/search_recipe')
 
