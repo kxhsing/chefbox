@@ -221,16 +221,9 @@ def request_recipe():
     user = User.query.filter(User.user_id==user_id).one()
 
     include_ingredients = request.form.getlist('search_ingredients')
-    # print include_ingredients
-
     cuisines = request.form.getlist('cuisines')
-    # print cuisines
-
     intolerances = request.form.getlist('intolerances')
-    # print intolerances
-
     diet = request.form.get('diet')
-    print diet
 
     payload = {
                 'addRecipeInformation': False, 
@@ -260,27 +253,27 @@ def request_recipe():
         recipe_ids.append(recipe_id)
 
     recipe_ids_bulk = ','.join(recipe_ids)
-    print recipe_ids_bulk
+    # print recipe_ids_bulk
 
-    bulk_recipe_results = requests.get(bulk_recipe_info, headers=headers, params={'ids': recipe_ids_bulk}) #something wrong here
-    print bulk_recipe_results
+    bulk_recipe_results = requests.get(bulk_recipe_info, headers=headers, params={'ids': recipe_ids_bulk}) 
 
     bulk_recipe_results = bulk_recipe_results.json()
 
-    print bulk_recipe_results
+    # print bulk_recipe_results
 
     for recipe in bulk_recipe_results:
         recipe_id = recipe['id']
         recipe_title = recipe['title']
-        recipe_source_name = recipe['sourceName']
-        recipe_source_url = recipe['sourceUrl']
+        recipe_source_name = recipe.get('sourceName')
+        recipe_source_url = recipe.get('sourceUrl')
         recipe_img = recipe['image']
 
         steps = recipe['analyzedInstructions'][0]['steps']
         step_instructions = [] #create list for all instruction steps
 
         for step in steps:
-            step_instructions.append(step['step'])
+            if len(step['step']) > 1:
+                step_instructions.append(step['step'])
 
         ingredients = recipe['extendedIngredients'] # list of dictionaries. each dict contains info about all ingredients, including 'name', 'amount', 'unit'
 
@@ -297,10 +290,16 @@ def request_recipe():
         recipe_info = [recipe_id, recipe_title, recipe_source_name, recipe_source_url, recipe_img, step_instructions, ingredient_names_amt]
         recipe_results_list.append(recipe_info) 
 
-    print recipe_results_list
+    # print recipe_results_list
 
-    
     return render_template("recipe_results.html", user=user, recipe_results_list=recipe_results_list)
+
+
+@app.route('/search_more', methods=["POST"])
+def search_more():
+    """If user wants more search results, request more from API"""
+    #Need to figure out how to increment by setting offset to return next 10 results
+    pass
 
 
 @app.route('/add_recipe', methods=["POST"])
@@ -311,11 +310,57 @@ def add_recipe():
     recipe_id = request.form.get('recipe_id')
     print recipe_id
 
-    # recipe = requests.get(get_recipe_info.format(id=recipe_id), headers=headers)
-    # recipe = requests.get("https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/{}/information".format(recipe_id), headers=headers)
-    recipe = requests.get(get_recipe_info.format(recipe_id), headers=headers)
-    recipe = recipe.json()
-    print recipe
+    saved_recipe = requests.get(get_recipe_info.format(recipe_id), headers=headers)
+    saved_recipe = saved_recipe.json() #dict
+    print saved_recipe
+
+
+    saved_recipe_title = recipe['title']
+    saved_recipe_source_name = recipe.get('sourceName')
+    saved_recipe_source_url = recipe.get('sourceUrl')
+
+
+    steps = recipe['analyzedInstructions'][0]['steps']
+    step_instructions = [] #create list for all instruction steps
+
+    for step in steps:
+        if len(step['step']) > 1:
+            step_instructions.append(step['step'])
+
+
+    #Create new recipe for database
+    new_recipe = Recipe(title=saved_recipe_title, 
+                        source_name=saved_recipe_source_name, 
+                        url=saved_recipe_source_url, 
+                        instructions=step_instructions,
+                        cooked=False)
+    db.session.add(new_recipe)
+    db.session.commit()
+
+    new_recipe_id = new_recipe.recipe_id
+
+    ingredients = recipe['extendedIngredients'] # list of dictionaries. each dict contains info about all ingredients, including 'name', 'amount', 'unit'
+    #Create Ingredient instances for ingredients that do not already exist in db
+    for ingredient in ingredients:
+        ingredient_name = ingredient['name']
+        if not Ingredient.query.filter(Ingredient.ingred_name==ingredient_name).all(): #if ingredient not in db. add to it
+            new_ingred = Ingredient(ingred_name=ingredient)
+            db.session.add(new_ingred)
+            db.session.commit()
+
+        ingred_id = Ingredient.query.filter(Ingredient.ingred_name==ingredient_name).one().ingred_id
+        # new_ingred_id = new_ingred.ingred_id
+
+        #Create RecipeIngredient instances 
+        new_recipe_ingred = RecipeIngredient(ingred_id=ingred_id, recipe_id=new_recipe_id)
+        db.session.add(new_recipe_ingred)
+        db.session.commit()
+
+    new_user_recipe = UserRecipe(recipe_id=new_recipe_id, user_id=user_id
+    db.session.add(new_user_recipe)
+    db.session.commit()
+
+
     
     return redirect('/search_recipe')
 
