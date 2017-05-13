@@ -327,47 +327,47 @@ def add_recipe():
         if len(step['step']) > 1:
             step_instructions.append(step['step'])
 
-
-    #Create new recipe for database
-    new_recipe = Recipe(title=saved_recipe_title, 
-                        source_name=saved_recipe_source_name, 
-                        url=saved_recipe_source_url, 
-                        instructions=step_instructions,
-                        cooked=False)
-    db.session.add(new_recipe)
-    db.session.commit()
-
-    new_recipe_id = new_recipe.recipe_id
-
-    ingredients = saved_recipe['extendedIngredients'] # list of dictionaries. each dict contains info about all ingredients, including 'name', 'amount', 'unit'
-    #Create Ingredient instances for ingredients that do not already exist in db
-    for ingredient in ingredients:
-        ingredient_name = ingredient['name']
-        ingredient_amt = ingredient['amount']
-        ingredient_unit = ingredient['unitShort']
-        if not Ingredient.query.filter(Ingredient.ingred_name==ingredient_name).all(): #if ingredient not in db. add to it
-            new_ingred = Ingredient(ingred_name=ingredient_name)
-            db.session.add(new_ingred)
-            db.session.commit()
-
-        ingred_id = Ingredient.query.filter(Ingredient.ingred_name==ingredient_name).one().ingred_id
-        # new_ingred_id = new_ingred.ingred_id
-
-        #Create RecipeIngredient instances 
-        new_recipe_ingred = RecipeIngredient(recipe_id=new_recipe_id, 
-                                            ingred_id=ingred_id, 
-                                            ingred_amt=ingredient_amt,
-                                            ingred_unit=ingredient_unit)
-        db.session.add(new_recipe_ingred)
+    if not Recipe.query.filter(Recipe.url==saved_recipe_source_url).all():
+        #Create new recipe for database if does not exist already
+        new_recipe = Recipe(title=saved_recipe_title, 
+                            source_name=saved_recipe_source_name, 
+                            url=saved_recipe_source_url, 
+                            instructions=step_instructions,
+                            cooked=False)
+        db.session.add(new_recipe)
         db.session.commit()
 
-    new_user_recipe = UserRecipe(recipe_id=new_recipe_id, user_id=user_id)
-    db.session.add(new_user_recipe)
-    db.session.commit()
+        new_recipe_id = new_recipe.recipe_id
 
-    print new_user_recipe
-    print new_recipe_ingred
-    print new_recipe
+        ingredients = saved_recipe['extendedIngredients'] # list of dictionaries. each dict contains info about all ingredients, including 'name', 'amount', 'unit'
+        #Create Ingredient instances for ingredients that do not already exist in db
+        for ingredient in ingredients:
+            ingredient_name = ingredient['name']
+            ingredient_amt = ingredient['amount']
+            ingredient_unit = ingredient['unitShort']
+            if not Ingredient.query.filter(Ingredient.ingred_name==ingredient_name).all(): #if ingredient not in db. add to it
+                new_ingred = Ingredient(ingred_name=ingredient_name)
+                db.session.add(new_ingred)
+                db.session.commit()
+
+            ingred_id = Ingredient.query.filter(Ingredient.ingred_name==ingredient_name).one().ingred_id
+            # new_ingred_id = new_ingred.ingred_id
+
+            #Create RecipeIngredient instances 
+            new_recipe_ingred = RecipeIngredient(recipe_id=new_recipe_id, 
+                                                ingred_id=ingred_id, 
+                                                ingred_amt=ingredient_amt,
+                                                ingred_unit=ingredient_unit)
+            db.session.add(new_recipe_ingred)
+            db.session.commit()
+
+        new_user_recipe = UserRecipe(recipe_id=new_recipe_id, user_id=user_id)
+        db.session.add(new_user_recipe)
+        db.session.commit()
+
+        print new_user_recipe
+        print new_recipe_ingred
+        print new_recipe
     
     return redirect('/search_recipe')
 

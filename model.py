@@ -58,7 +58,7 @@ class Recipe(db.Model):
     recipe_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     source_name = db.Column(db.String(100), nullable=True)
-    url = db.Column(db.Text, nullable=True)
+    url = db.Column(db.Text, nullable=True, unique=True)
     instructions = db.Column(db.Text, nullable=False)
     cooked = db.Column(db.Boolean)
 
