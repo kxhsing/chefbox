@@ -315,12 +315,12 @@ def add_recipe():
     print saved_recipe
 
 
-    saved_recipe_title = recipe['title']
-    saved_recipe_source_name = recipe.get('sourceName')
-    saved_recipe_source_url = recipe.get('sourceUrl')
+    saved_recipe_title = saved_recipe['title']
+    saved_recipe_source_name = saved_recipe.get('sourceName')
+    saved_recipe_source_url = saved_recipe.get('sourceUrl')
 
 
-    steps = recipe['analyzedInstructions'][0]['steps']
+    steps = saved_recipe['analyzedInstructions'][0]['steps']
     step_instructions = [] #create list for all instruction steps
 
     for step in steps:
@@ -339,12 +339,14 @@ def add_recipe():
 
     new_recipe_id = new_recipe.recipe_id
 
-    ingredients = recipe['extendedIngredients'] # list of dictionaries. each dict contains info about all ingredients, including 'name', 'amount', 'unit'
+    ingredients = saved_recipe['extendedIngredients'] # list of dictionaries. each dict contains info about all ingredients, including 'name', 'amount', 'unit'
     #Create Ingredient instances for ingredients that do not already exist in db
     for ingredient in ingredients:
         ingredient_name = ingredient['name']
+        ingredient_amt = ingredient['amount']
+        ingredient_unit = ingredient['unitShort']
         if not Ingredient.query.filter(Ingredient.ingred_name==ingredient_name).all(): #if ingredient not in db. add to it
-            new_ingred = Ingredient(ingred_name=ingredient)
+            new_ingred = Ingredient(ingred_name=ingredient_name)
             db.session.add(new_ingred)
             db.session.commit()
 
@@ -352,15 +354,20 @@ def add_recipe():
         # new_ingred_id = new_ingred.ingred_id
 
         #Create RecipeIngredient instances 
-        new_recipe_ingred = RecipeIngredient(ingred_id=ingred_id, recipe_id=new_recipe_id)
+        new_recipe_ingred = RecipeIngredient(recipe_id=new_recipe_id, 
+                                            ingred_id=ingred_id, 
+                                            ingred_amt=ingredient_amt,
+                                            ingred_unit=ingredient_unit)
         db.session.add(new_recipe_ingred)
         db.session.commit()
 
-    new_user_recipe = UserRecipe(recipe_id=new_recipe_id, user_id=user_id
+    new_user_recipe = UserRecipe(recipe_id=new_recipe_id, user_id=user_id)
     db.session.add(new_user_recipe)
     db.session.commit()
 
-
+    print new_user_recipe
+    print new_recipe_ingred
+    print new_recipe
     
     return redirect('/search_recipe')
 

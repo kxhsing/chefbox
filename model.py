@@ -58,7 +58,7 @@ class Recipe(db.Model):
     recipe_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     source_name = db.Column(db.String(100), nullable=True)
-    url = db.Column(db.Text, nullable=True, unique=True)
+    url = db.Column(db.Text, nullable=True)
     instructions = db.Column(db.Text, nullable=False)
     cooked = db.Column(db.Boolean)
 
@@ -79,8 +79,18 @@ class RecipeIngredient(db.Model):
     __tablename__ = "recipe_ingredients"
 
     recipe_ingredient_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    ingred_id = db.Column(db.Integer, db.ForeignKey('ingredients.ingred_id'), nullable=False)
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.recipe_id'), nullable=False)
+    ingred_id = db.Column(db.Integer, db.ForeignKey('ingredients.ingred_id'), nullable=False)
+    ingred_amt = db.Column(db.Integer, nullable=True)
+    ingred_unit = db.Column(db.String(20), nullable=True)
+
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+        return "<RecipeIngredient recipe_ingred_id={} ingred_id={} recipe_id={}>".format(
+                                                                                self.recipe_ingredient_id, 
+                                                                                self.ingred_id,
+                                                                                self.recipe_id)
 
 
 class UserIngredient(db.Model):
@@ -115,10 +125,10 @@ class UserRecipe(db.Model):
 
     def __repr__(self):
         """Provide helpful representation when printed."""
-        return "<UserRecipe user_recipe_id={} user_id={} recipe={}>".format(
+        return "<UserRecipe user_recipe_id={} user_id={} recipe_id={}>".format(
                                                                     self.user_recipe_id,
                                                                     self.user_id,
-                                                                    self.recipe.title)
+                                                                    self.recipe_id)
 
 
 class Review(db.Model):
