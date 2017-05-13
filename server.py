@@ -353,6 +353,7 @@ def add_recipe():
             ingred_id = Ingredient.query.filter(Ingredient.ingred_name==ingredient_name).one().ingred_id
             # new_ingred_id = new_ingred.ingred_id
 
+
             #Create RecipeIngredient instances 
             new_recipe_ingred = RecipeIngredient(recipe_id=new_recipe_id, 
                                                 ingred_id=ingred_id, 
@@ -361,7 +362,12 @@ def add_recipe():
             db.session.add(new_recipe_ingred)
             db.session.commit()
 
-        new_user_recipe = UserRecipe(recipe_id=new_recipe_id, user_id=user_id)
+
+    existing_recipe_recipe_id = Recipe.query.filter(Recipe.url==saved_recipe_source_url).one().url
+
+
+    if not UserRecipe.query.filter(UserRecipe.user_id=user_id, UserRecipe.recipe_id).all():
+        new_user_recipe = UserRecipe(recipe_id=existing_recipe_id, user_id=user_id)
         db.session.add(new_user_recipe)
         db.session.commit()
 
