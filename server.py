@@ -224,6 +224,15 @@ def request_recipe():
     cuisines = request.form.getlist('cuisines')
     intolerances = request.form.getlist('intolerances')
     diet = request.form.get('diet')
+    offset = 0
+
+    #Save user's search parameters in session in case want to search more
+    session['include_ingred'] = include_ingredients 
+    session['cuisines'] = cuisines
+    session['intolerances'] = intolerances
+    session['diet'] = diet
+    session['offset'] = offset
+    
 
     payload = {
                 'addRecipeInformation': False, 
@@ -233,6 +242,7 @@ def request_recipe():
                 'cuisine': cuisines,
                 'intolerances': intolerances,
                 'ranking': 1,
+                'offset': offset,
             }
 
     recipes = requests.get(search_recipe_complex, headers=headers, params=payload)
@@ -244,6 +254,7 @@ def request_recipe():
     recipe_results_list = [] #list of recipes to pass to recipe_results.html
 
     recipe_results = recipes['results'] 
+    total_results = recipes['totalResults']
     # print recipe_results
 
     recipe_ids = []
@@ -292,14 +303,103 @@ def request_recipe():
 
     # print recipe_results_list
 
-    return render_template("recipe_results.html", user=user, recipe_results_list=recipe_results_list)
+    return render_template("recipe_results.html", user=user, recipe_results_list=recipe_results_list, total_results=total_results)
 
 
 @app.route('/search_more', methods=["POST"])
 def search_more():
     """If user wants more search results, request more from API"""
-    #Need to figure out how to increment by setting offset to return next 10 results
-    pass
+
+    user_id = session.get("user_id")
+    user = User.query.filter(User.user_id==user_id).one()
+
+    #Get number to offset in search results and increment session
+    offset_increment = int(request.form.get("more_results"))
+
+    current_offset = session.get("offset")
+    current_offset += offset_increment
+    session['offset'] = current_offset
+
+    include_ingredients = session.get("include_ingred")
+    diet = session.get("diet")
+    cuisines = session.get("cuisines")
+    intolerances = session.get("intolerances")
+
+    payload = {
+            'addRecipeInformation': False, 
+            'includeIngredients': include_ingredients,
+            'instructionsRequired': True,
+            'diet': diet,
+            'cuisine': cuisines,
+            'intolerances': intolerances,
+            'ranking': 1,
+            'offset': current_offset,
+        }
+
+    recipes = requests.get(search_recipe_complex, headers=headers, params=payload)
+    recipes = recipes.json()
+
+    recipe_formatted = json.dumps(recipes, indent=4, sort_keys=True) #formatting the responses nicely in terminal
+    print recipe_formatted #view formatted response in terminal
+
+    recipe_results_list = [] #list of recipes to pass to recipe_results.html
+
+    recipe_results = recipes['results'] 
+    total_results = recipes['totalResults']
+    # print recipe_results
+
+    recipe_ids = []
+
+    for recipe in recipe_results: #fetch each recipe id, add to id list and run in "Get Bulk Recipe Info" endpoint
+        recipe_id = str(recipe['id'])
+        recipe_ids.append(recipe_id)
+
+    recipe_ids_bulk = ','.join(recipe_ids)
+    # print recipe_ids_bulk
+
+    bulk_recipe_results = requests.get(bulk_recipe_info, headers=headers, params={'ids': recipe_ids_bulk}) 
+
+    bulk_recipe_results = bulk_recipe_results.json()
+
+    # print bulk_recipe_results
+
+    for recipe in bulk_recipe_results:
+        recipe_id = recipe['id']
+        recipe_title = recipe['title']
+        recipe_source_name = recipe.get('sourceName')
+        recipe_source_url = recipe.get('sourceUrl')
+        recipe_img = recipe['image']
+
+        steps = recipe['analyzedInstructions'][0]['steps']
+        step_instructions = [] #create list for all instruction steps
+
+        for step in steps:
+            if len(step['step']) > 1:
+                step_instructions.append(step['step'])
+
+        ingredients = recipe['extendedIngredients'] # list of dictionaries. each dict contains info about all ingredients, including 'name', 'amount', 'unit'
+
+        ingredient_names_amt = []
+        for ingredient in ingredients:
+            ingredient_name = ingredient['name'].title()
+            ingredient_amt = str(ingredient['amount'])+" "
+            ingredient_unit = ingredient['unitShort'].lower()+" - "
+            ingredient_final = ingredient_amt + ingredient_unit + ingredient_name
+            ingredient_names_amt.append(ingredient_final)
+
+
+        #master list of info with id, title, name, source, image, for each recipe
+        recipe_info = [recipe_id, recipe_title, recipe_source_name, recipe_source_url, recipe_img, step_instructions, ingredient_names_amt]
+        recipe_results_list.append(recipe_info) 
+
+    # print recipe_results_list
+
+    return render_template("recipe_results.html", user=user, recipe_results_list=recipe_results_list, total_results=total_results)
+
+
+    # return redirect('/search_recipe')
+    # return render_template("user_ingred.html", user=user)
+
 
 
 @app.route('/add_recipe', methods=["POST"])
@@ -327,7 +427,7 @@ def add_recipe():
         if len(step['step']) > 1:
             step_instructions.append(step['step'])
 
-    print step_instructions
+    # print step_instructions
 
     if not Recipe.query.filter(Recipe.url==saved_recipe_source_url).all():
         #Create new recipe for database if does not exist already
@@ -335,7 +435,7 @@ def add_recipe():
                             source_name=saved_recipe_source_name, 
                             url=saved_recipe_source_url, 
                             instructions=step_instructions)
-        
+
         db.session.add(new_recipe)
         db.session.commit()
 
@@ -354,14 +454,9 @@ def add_recipe():
 
             ingred_id = Ingredient.query.filter(Ingredient.ingred_name==ingredient_name).one().ingred_id
 
-            # ingredient_name = ingredient['name'].title()
-            # ingredient_amt = str(ingredient['amount'])+" "
-            # ingredient_unit = ingredient['unitShort'].lower()+" - "
-            # ingredient_final = ingredient_amt + ingredient_unit + ingredient_name
-
             #Create RecipeIngredient instances 
             ingred_info = str(ingredient_amt)+ " " + ingredient_unit.lower() + " - " + ingredient_name.title()
-            print ingred_info
+
             new_recipe_ingred = RecipeIngredient(recipe_id=new_recipe_id, 
                                                 ingred_id=ingred_id, 
                                                 ingred_info=ingred_info)
@@ -375,9 +470,6 @@ def add_recipe():
         new_user_recipe = UserRecipe(recipe_id=existing_recipe_id, user_id=user_id, cooked=False)
         db.session.add(new_user_recipe)
         db.session.commit()
-
-        print new_user_recipe
-
     
     return redirect('/search_recipe')
 

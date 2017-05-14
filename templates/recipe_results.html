@@ -55,12 +55,18 @@
               <p></p>
             {% endfor %}
 
+      {% if total_results > 10 and session['offset'] < 900 %}
+          <form action="/search_more" method="POST">
+                <button type="submit" name="more_results" value="10">More Results</button>
+          </form>
+      {% endif %}
+
     {% else %}
       <p>We couldn't find a recipe with the parameters you specified. Please search again.</p>
 
     {% endif %}
 
-  <p><a href="/search_recipe">Search for more recipes</a></p>
+  <p><a href="/search_recipe">New Recipe Search</a></p>
 
 
 

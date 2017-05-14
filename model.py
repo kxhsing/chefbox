@@ -64,7 +64,6 @@ class Recipe(db.Model):
     #Define association relationship with ingredient
     ingredients = db.relationship("Ingredient", secondary="recipe_ingredients", 
                                     backref="recipes") #will only lead to name of ingreds
-    ####?
     ingredient_info = db.relationship("RecipeIngredient", backref="recipes") #not sure about this
 
 
@@ -82,9 +81,7 @@ class RecipeIngredient(db.Model):
     recipe_ingredient_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.recipe_id'), nullable=False)
     ingred_id = db.Column(db.Integer, db.ForeignKey('ingredients.ingred_id'), nullable=False)
-    ingred_info = db.Column(db.String(100))
-    # ingred_amt = db.Column(db.String(10), nullable=True)
-    # ingred_unit = db.Column(db.String(20), nullable=True)
+    ingred_info = db.Column(db.String(100)) # will include recipe ingredient name, amount, and unit
 
 
     def __repr__(self):
