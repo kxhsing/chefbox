@@ -315,7 +315,7 @@ def add_recipe():
     print saved_recipe
 
 
-    saved_recipe_title = saved_recipe['title']
+    saved_recipe_title = saved_recipe['title'].encode('utf-8')
     saved_recipe_source_name = saved_recipe.get('sourceName')
     saved_recipe_source_url = saved_recipe.get('sourceUrl')
 

@@ -60,7 +60,6 @@ class Recipe(db.Model):
     source_name = db.Column(db.String(100), nullable=True)
     url = db.Column(db.Text, nullable=True, unique=True)
     instructions = db.Column(db.Text, nullable=False)
-    cooked = db.Column(db.Boolean)
 
     #Define association relationship with ingredient
     ingredients = db.relationship("Ingredient", secondary="recipe_ingredients", 
@@ -117,10 +116,7 @@ class UserRecipe(db.Model):
     user_recipe_id = db.Column(db.Integer, autoincrement=True, primary_key=True) 
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipes.recipe_id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-
-    # #Establish relationships
-    # user = db.relationship("User", backref=db.backref("user_recipes"))
-    # recipe = db.relationship("Recipe", backref=db.backref("user_recipess"))
+    cooked = db.Column(db.Boolean)
 
 
     def __repr__(self):
