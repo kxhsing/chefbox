@@ -327,13 +327,15 @@ def add_recipe():
         if len(step['step']) > 1:
             step_instructions.append(step['step'])
 
+    print step_instructions
+
     if not Recipe.query.filter(Recipe.url==saved_recipe_source_url).all():
         #Create new recipe for database if does not exist already
         new_recipe = Recipe(title=saved_recipe_title, 
                             source_name=saved_recipe_source_name, 
                             url=saved_recipe_source_url, 
-                            instructions=step_instructions,
-                            cooked=False)
+                            instructions=step_instructions)
+        
         db.session.add(new_recipe)
         db.session.commit()
 
@@ -351,14 +353,18 @@ def add_recipe():
                 db.session.commit()
 
             ingred_id = Ingredient.query.filter(Ingredient.ingred_name==ingredient_name).one().ingred_id
-            # new_ingred_id = new_ingred.ingred_id
 
+            # ingredient_name = ingredient['name'].title()
+            # ingredient_amt = str(ingredient['amount'])+" "
+            # ingredient_unit = ingredient['unitShort'].lower()+" - "
+            # ingredient_final = ingredient_amt + ingredient_unit + ingredient_name
 
             #Create RecipeIngredient instances 
+            ingred_info = str(ingredient_amt)+ " " + ingredient_unit.lower() + " - " + ingredient_name.title()
+            print ingred_info
             new_recipe_ingred = RecipeIngredient(recipe_id=new_recipe_id, 
                                                 ingred_id=ingred_id, 
-                                                ingred_amt=ingredient_amt,
-                                                ingred_unit=ingredient_unit)
+                                                ingred_info=ingred_info)
             db.session.add(new_recipe_ingred)
             db.session.commit()
 
@@ -366,7 +372,7 @@ def add_recipe():
     existing_recipe_id = Recipe.query.filter(Recipe.url==saved_recipe_source_url).one().recipe_id
 
     if not UserRecipe.query.filter(UserRecipe.user_id==user_id, UserRecipe.recipe_id==existing_recipe_id).all():
-        new_user_recipe = UserRecipe(recipe_id=existing_recipe_id, user_id=user_id)
+        new_user_recipe = UserRecipe(recipe_id=existing_recipe_id, user_id=user_id, cooked=False)
         db.session.add(new_user_recipe)
         db.session.commit()
 

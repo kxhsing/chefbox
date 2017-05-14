@@ -13,7 +13,7 @@
                       <th>{{ recipe.title }}</th>
                     </tr>
                     <tr>
-                      <td> via {% if recipe.url and recipe.recipe_source_name %}<a href="{{ recipe.url }}"> {{ recipe.source_name }} </a> 
+                      <td> via {% if recipe.url and recipe.source_name %}<a href="{{ recipe.url }}"> {{ recipe.source_name }} </a> 
                               {% elif recipe.url %}
                                 <a href="{{ recipe.url }}"> [Original Source] </a> 
                               {% else %} 
@@ -21,28 +21,24 @@
                               {% endif %}
                           </td>
                       </tr>
-<!--                       <tr>
+                      <tr>
                         <td>Ingredients<br>
                           <ul>
-                          {% for ingredient in recipe.ingredients %}
-                              <li>{{ ingredient.ingred_name }}</li>
+                          {% for ingredient in recipe.ingredient_info %}
+                              <li>{{ ingredient.ingred_info }}</li>
                           {% endfor %}
                         </ul>
                         </td>
-                      </tr> -->
+                      </tr>
                         <tr>
                           <td>Instructions<br>
-                            <ol>
-                            {% for instruction in recipe.instructions %}
-                                <li>{{ instruction }}</li>
-                            {% endfor %}
-                          </ol>
+                            {{ recipe.instructions }}
                           </td>
                         </tr>
                       <tr>
                         <td>
                         <form action="/review_recipe" method="POST">
-                              <button type="submit" name="recipe_id" value="{{ recipe.recipe_id] }}">Cooked</button>
+                              <button type="submit" name="recipe_id" value="{{ recipe.recipe_id }}">Cooked</button>
                         </form>
                         </td>
                       </tr>
