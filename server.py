@@ -469,12 +469,25 @@ def add_recipe():
         db.session.add(new_user_recipe)
         db.session.flush()
 
-
     db.session.commit()
 
     return redirect('/search_recipe')
 
 
+@app.route('/review_recipe', methods=["POST"])
+def review_recipe():
+    user_id = session.get("user_id")
+    user = User.query.filter(User.user_id==user_id).one()
+    recipe_id = request.form.get("recipe_id") 
+    cooked_recipe = UserRecipe.query.filter(UserRecipe.user_id==user_id, UserRecipe.recipe_id==recipe_id).one()
+    cooked_recipe.cooked = True #does this need to be committed?
+
+    new_review = Review(recipe_id=recipe_id, user_id=user_id)
+    db.session.add(new_review)
+    db.session.commit()
+
+
+    return render_template("user_board.html", user=user)
 
 
 if __name__ == "__main__":

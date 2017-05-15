@@ -32,7 +32,12 @@
                       </tr>
                         <tr>
                           <td>Instructions<br>
-                            {{ recipe.instructions }}
+                            {% set instruction_list = recipe.instructions[2:-3].split("\",\"") %}
+                            <ol>
+                            {% for instruction in instruction_list %}
+                              <li>{{ instruction }}</li>
+                            {% endfor %}
+                            </ol>
                           </td>
                         </tr>
                       <tr>
