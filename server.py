@@ -213,40 +213,20 @@ def search_recipe():
                             types=types)
 
 
-@app.route('/search_recipe', methods=["POST"])
-def request_recipe():
-    """GET request for recipes"""
 
-    user_id = session.get("user_id")
-    user = User.query.filter(User.user_id==user_id).one()
-
-    # if 'offset' in session:
-    #     del session['offset']
-
-    include_ingredients = request.form.getlist('search_ingredients')
-    cuisines = request.form.getlist('cuisines')
-    intolerances = request.form.getlist('intolerances')
-    diet = request.form.get('diet')
-    offset = 0
-
-    #Save user's search parameters in session in case want to search more
-    session['include_ingred'] = include_ingredients 
-    session['cuisines'] = cuisines
-    session['intolerances'] = intolerances
-    session['diet'] = diet
-    session['offset'] = offset
-    
+def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset):
+    """Make GET requests for recipe searches. Used in both /search_recipe and /search_more routes"""
 
     payload = {
-                'addRecipeInformation': False, 
-                'includeIngredients': include_ingredients,
-                'instructionsRequired': True,
-                'diet': diet,
-                'cuisine': cuisines,
-                'intolerances': intolerances,
-                'ranking': 1,
-                'offset': offset,
-            }
+            'addRecipeInformation': False, 
+            'includeIngredients': include_ingredients,
+            'instructionsRequired': True,
+            'diet': diet,
+            'cuisine': cuisines,
+            'intolerances': intolerances,
+            'ranking': 1,
+            'offset': offset,
+        }
 
     recipes = requests.get(search_recipe_complex, headers=headers, params=payload)
     recipes = recipes.json()
@@ -302,9 +282,41 @@ def request_recipe():
 
             #master list of info with id, title, name, source, image, for each recipe
             recipe_info = [recipe_id, recipe_title, recipe_source_name, recipe_source_url, recipe_img, step_instructions, ingredient_names_amt]
-            recipe_results_list.append(recipe_info) 
+            recipe_results_list.append(recipe_info)
 
-        # print recipe_results_list
+        request_result = (total_results, recipe_results_list)
+
+    return request_result    
+
+
+
+@app.route('/search_recipe', methods=["POST"])
+def request_recipe():
+    """GET request for recipes"""
+
+    user_id = session.get("user_id")
+    user = User.query.filter(User.user_id==user_id).one()
+
+    # if 'offset' in session:
+    #     del session['offset']
+
+    include_ingredients = request.form.getlist('search_ingredients')
+    cuisines = request.form.getlist('cuisines')
+    intolerances = request.form.getlist('intolerances')
+    diet = request.form.get('diet')
+    offset = 0
+
+    #Save user's search parameters in session in case want to search more
+    session['include_ingred'] = include_ingredients 
+    session['cuisines'] = cuisines
+    session['intolerances'] = intolerances
+    session['diet'] = diet
+    session['offset'] = offset
+
+    result = get_recipe_request(include_ingredients, cuisines, intolerances, diet, offset)
+
+    recipe_results_list = result[1]
+    total_results = result[0]
 
     return render_template("recipe_results.html", user=user, recipe_results_list=recipe_results_list, total_results=total_results)
 
@@ -319,83 +331,20 @@ def search_more():
     #Get number to offset in search results and increment session
     offset_increment = int(request.form.get("more_results"))
 
-    current_offset = session.get("offset")
-    current_offset += offset_increment
-    session['offset'] = current_offset
+    offset = session.get("offset")
+    offset += offset_increment
+    session['offset'] = offset
 
     include_ingredients = session.get("include_ingred")
     diet = session.get("diet")
     cuisines = session.get("cuisines")
     intolerances = session.get("intolerances")
 
-    payload = {
-            'addRecipeInformation': False, 
-            'includeIngredients': include_ingredients,
-            'instructionsRequired': True,
-            'diet': diet,
-            'cuisine': cuisines,
-            'intolerances': intolerances,
-            'ranking': 1,
-            'offset': current_offset,
-        }
 
-    recipes = requests.get(search_recipe_complex, headers=headers, params=payload)
-    recipes = recipes.json()
+    result = get_recipe_request(include_ingredients, cuisines, intolerances, diet, offset)
 
-    recipe_formatted = json.dumps(recipes, indent=4, sort_keys=True) #formatting the responses nicely in terminal
-    print recipe_formatted #view formatted response in terminal
-
-    recipe_results_list = [] #list of recipes to pass to recipe_results.html
-
-    recipe_results = recipes['results'] 
-    total_results = recipes['totalResults']
-    # print recipe_results
-
-    recipe_ids = []
-
-    for recipe in recipe_results: #fetch each recipe id, add to id list and run in "Get Bulk Recipe Info" endpoint
-        recipe_id = str(recipe['id'])
-        recipe_ids.append(recipe_id)
-
-    recipe_ids_bulk = ','.join(recipe_ids)
-    # print recipe_ids_bulk
-
-    bulk_recipe_results = requests.get(bulk_recipe_info, headers=headers, params={'ids': recipe_ids_bulk}) 
-
-    bulk_recipe_results = bulk_recipe_results.json()
-
-    # print bulk_recipe_results
-
-    for recipe in bulk_recipe_results:
-        recipe_id = recipe['id']
-        recipe_title = recipe['title']
-        recipe_source_name = recipe.get('sourceName')
-        recipe_source_url = recipe.get('sourceUrl')
-        recipe_img = recipe['image']
-
-        steps = recipe['analyzedInstructions'][0]['steps']
-        step_instructions = [] #create list for all instruction steps
-
-        for step in steps:
-            if len(step['step']) > 1:
-                step_instructions.append(step['step'])
-
-        ingredients = recipe['extendedIngredients'] # list of dictionaries. each dict contains info about all ingredients, including 'name', 'amount', 'unit'
-
-        ingredient_names_amt = []
-        for ingredient in ingredients:
-            ingredient_name = ingredient['name'].title()
-            ingredient_amt = str(ingredient['amount'])+" "
-            ingredient_unit = ingredient['unitShort'].lower()+" - "
-            ingredient_final = ingredient_amt + ingredient_unit + ingredient_name
-            ingredient_names_amt.append(ingredient_final)
-
-
-        #master list of info with id, title, name, source, image, for each recipe
-        recipe_info = [recipe_id, recipe_title, recipe_source_name, recipe_source_url, recipe_img, step_instructions, ingredient_names_amt]
-        recipe_results_list.append(recipe_info) 
-
-    # print recipe_results_list
+    recipe_results_list = result[1]
+    total_results = result[0]
 
     return render_template("recipe_results.html", user=user, recipe_results_list=recipe_results_list, total_results=total_results)
 
