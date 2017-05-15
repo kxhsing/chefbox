@@ -7,7 +7,7 @@
     <h2>Search for a Recipe</h2>
     {% if user.ingredients %}
       <p>Include Ingredients from Inventory:</p>
-      <form action="/search_recipe" method="POST">
+      <form action="/request_recipe" method="POST">
         <ul>
           {% for ingredient in user.ingredients %}
               <li><input type="checkbox" name="search_ingredients" value="{{ ingredient.ingred_name }}" checked>{{ ingredient.ingred_name.title() }}</li>

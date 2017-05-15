@@ -290,15 +290,12 @@ def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset
 
 
 
-@app.route('/search_recipe', methods=["POST"])
+@app.route('/request_recipe', methods=["POST"])
 def request_recipe():
     """GET request for recipes"""
 
     user_id = session.get("user_id")
     user = User.query.filter(User.user_id==user_id).one()
-
-    # if 'offset' in session:
-    #     del session['offset']
 
     include_ingredients = request.form.getlist('search_ingredients')
     cuisines = request.form.getlist('cuisines')
