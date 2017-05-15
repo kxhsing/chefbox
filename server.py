@@ -220,6 +220,9 @@ def request_recipe():
     user_id = session.get("user_id")
     user = User.query.filter(User.user_id==user_id).one()
 
+    # if 'offset' in session:
+    #     del session['offset']
+
     include_ingredients = request.form.getlist('search_ingredients')
     cuisines = request.form.getlist('cuisines')
     intolerances = request.form.getlist('intolerances')
@@ -255,53 +258,53 @@ def request_recipe():
 
     recipe_results = recipes['results'] 
     total_results = recipes['totalResults']
-    # print recipe_results
+    if recipe_results: #checking if any results returned. 
+        # print recipe_results
 
-    recipe_ids = []
+        recipe_ids = []
 
-    for recipe in recipe_results: #fetch each recipe id, add to id list and run in "Get Bulk Recipe Info" endpoint
-        recipe_id = str(recipe['id'])
-        recipe_ids.append(recipe_id)
+        for recipe in recipe_results: #fetch each recipe id, add to id list and run in "Get Bulk Recipe Info" endpoint
+            recipe_id = str(recipe['id'])
+            recipe_ids.append(recipe_id)
 
-    recipe_ids_bulk = ','.join(recipe_ids)
-    # print recipe_ids_bulk
+        recipe_ids_bulk = ','.join(recipe_ids)
+        print recipe_ids_bulk
 
-    bulk_recipe_results = requests.get(bulk_recipe_info, headers=headers, params={'ids': recipe_ids_bulk}) 
+        bulk_recipe_results = requests.get(bulk_recipe_info, headers=headers, params={'ids': recipe_ids_bulk}) 
+        bulk_recipe_results = bulk_recipe_results.json()
 
-    bulk_recipe_results = bulk_recipe_results.json()
+        # print bulk_recipe_results
 
-    # print bulk_recipe_results
+        for recipe in bulk_recipe_results:
+            recipe_id = recipe['id']
+            recipe_title = recipe['title']
+            recipe_source_name = recipe.get('sourceName')
+            recipe_source_url = recipe.get('sourceUrl')
+            recipe_img = recipe['image']
 
-    for recipe in bulk_recipe_results:
-        recipe_id = recipe['id']
-        recipe_title = recipe['title']
-        recipe_source_name = recipe.get('sourceName')
-        recipe_source_url = recipe.get('sourceUrl')
-        recipe_img = recipe['image']
+            steps = recipe['analyzedInstructions'][0]['steps']
+            step_instructions = [] #create list for all instruction steps
 
-        steps = recipe['analyzedInstructions'][0]['steps']
-        step_instructions = [] #create list for all instruction steps
+            for step in steps:
+                if len(step['step']) > 1:
+                    step_instructions.append(step['step'])
 
-        for step in steps:
-            if len(step['step']) > 1:
-                step_instructions.append(step['step'])
+            ingredients = recipe['extendedIngredients'] # list of dictionaries. each dict contains info about all ingredients, including 'name', 'amount', 'unit'
 
-        ingredients = recipe['extendedIngredients'] # list of dictionaries. each dict contains info about all ingredients, including 'name', 'amount', 'unit'
-
-        ingredient_names_amt = []
-        for ingredient in ingredients:
-            ingredient_name = ingredient['name'].title()
-            ingredient_amt = str(ingredient['amount'])+" "
-            ingredient_unit = ingredient['unitShort'].lower()+" - "
-            ingredient_final = ingredient_amt + ingredient_unit + ingredient_name
-            ingredient_names_amt.append(ingredient_final)
+            ingredient_names_amt = []
+            for ingredient in ingredients:
+                ingredient_name = ingredient['name'].title()
+                ingredient_amt = str(ingredient['amount'])+" "
+                ingredient_unit = ingredient['unitShort'].lower()+" - "
+                ingredient_final = ingredient_amt + ingredient_unit + ingredient_name
+                ingredient_names_amt.append(ingredient_final)
 
 
-        #master list of info with id, title, name, source, image, for each recipe
-        recipe_info = [recipe_id, recipe_title, recipe_source_name, recipe_source_url, recipe_img, step_instructions, ingredient_names_amt]
-        recipe_results_list.append(recipe_info) 
+            #master list of info with id, title, name, source, image, for each recipe
+            recipe_info = [recipe_id, recipe_title, recipe_source_name, recipe_source_url, recipe_img, step_instructions, ingredient_names_amt]
+            recipe_results_list.append(recipe_info) 
 
-    # print recipe_results_list
+        # print recipe_results_list
 
     return render_template("recipe_results.html", user=user, recipe_results_list=recipe_results_list, total_results=total_results)
 
@@ -397,11 +400,6 @@ def search_more():
     return render_template("recipe_results.html", user=user, recipe_results_list=recipe_results_list, total_results=total_results)
 
 
-    # return redirect('/search_recipe')
-    # return render_template("user_ingred.html", user=user)
-
-
-
 @app.route('/add_recipe', methods=["POST"])
 def add_recipe():
     user_id = session.get("user_id")
@@ -437,7 +435,7 @@ def add_recipe():
                             instructions=step_instructions)
 
         db.session.add(new_recipe)
-        db.session.commit()
+        db.session.flush()
 
         new_recipe_id = new_recipe.recipe_id
 
@@ -450,7 +448,7 @@ def add_recipe():
             if not Ingredient.query.filter(Ingredient.ingred_name==ingredient_name).all(): #if ingredient not in db. add to it
                 new_ingred = Ingredient(ingred_name=ingredient_name)
                 db.session.add(new_ingred)
-                db.session.commit()
+                db.session.flush()
 
             ingred_id = Ingredient.query.filter(Ingredient.ingred_name==ingredient_name).one().ingred_id
 
@@ -461,7 +459,7 @@ def add_recipe():
                                                 ingred_id=ingred_id, 
                                                 ingred_info=ingred_info)
             db.session.add(new_recipe_ingred)
-            db.session.commit()
+            db.session.flush()
 
 
     existing_recipe_id = Recipe.query.filter(Recipe.url==saved_recipe_source_url).one().recipe_id
@@ -469,9 +467,14 @@ def add_recipe():
     if not UserRecipe.query.filter(UserRecipe.user_id==user_id, UserRecipe.recipe_id==existing_recipe_id).all():
         new_user_recipe = UserRecipe(recipe_id=existing_recipe_id, user_id=user_id, cooked=False)
         db.session.add(new_user_recipe)
-        db.session.commit()
-    
+        db.session.flush()
+
+
+    db.session.commit()
+
     return redirect('/search_recipe')
+
+
 
 
 if __name__ == "__main__":
