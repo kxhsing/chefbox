@@ -8,7 +8,7 @@
     {% if user.ingredients %}
       <p>Include Ingredients from Inventory:</p>
       <form action="/request_recipe" method="POST">
-        <ul>
+        <ul id="ingred-list">
           {% for ingredient in user.ingredients %}
               <li><input type="checkbox" name="search_ingredients" value="{{ ingredient.ingred_name }}" checked>{{ ingredient.ingred_name.title() }}</li>
           {% endfor %}
@@ -46,12 +46,38 @@
 
 
     <p>Forget something? Add an ingredient:</p>
-      <form action="/add_ingred" method="POST">
-        <input type="text" name="ingredient">
+      <form action="/add_ingred" method="POST" id="add-ingred">
+        <input type="text" name="ingredient" id="ingredient">
         <input type="submit" value="Add">
       </form>
 
+    <script>
 
+      function ingredAddResult(result) {
+        console.log(result);
+        var ingredList = $("#ingred-list");
+        var ingredientName = result.ingredient;
+        if (ingredientName) {
+        var ingredID = result.ingred_id;
+        console.log(ingredID);
+        ingredList[0].innerHTML = ingredList.html() + '<li><input type="checkbox" name="search_ingredients" value="'+ingredientName+'" checked>'+ingredientName+'</li>';
+        };
+      }
+
+      function addIngred(evt) {
+        evt.preventDefault();
+
+        var formInputs = {
+          "ingredient": $("#ingredient").val()
+        };
+
+        $.post("/add_ingred", formInputs, ingredAddResult);
+      }
+
+      $("#add-ingred").on("submit", addIngred);
+
+
+   </script>
 
 
 

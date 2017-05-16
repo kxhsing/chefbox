@@ -6,26 +6,57 @@
 
     <h2>Ingredient Inventory</h2>
     {% if user.ingredients %}
-    <ul>
+    <ul id="ingred_list">
+
     {% for ingredient in user.ingredients %}
         <li>{{ ingredient.ingred_name.title() }}</li>
+
+
         <form action="/del_ingred" method="post">
           <button type="submit" name="ingredient" value="{{ ingredient.ingred_id }}">x</button>
         </form>
     {% endfor %}
       </ul>
+
+
     {% endif %}
 
 
+
     <h3>Add Ingredient</h3>
-      <form action="/add_ingred" method="POST">
-        <input type="text" name="ingredient">
+      <form action="/add_ingred" method="POST" id="add_ingred">
+        <input type="text" name="ingredient" id="ingredient">
         <input type="submit" value="Add">
       </form>
 
 
 
+    <script>
 
+      function ingredAddResult(result) {
+        console.log(result);
+        var ingredList = $("#ingred_list");
+        var ingredientName = result.ingredient;
+        if (ingredientName) {
+        var ingredID = result.ingred_id;
+        console.log(ingredID);
+        ingredList[0].innerHTML = ingredList.html() + '<li>'+ingredientName+'</li> <form action="/del_ingred" method="post"> <button type="submit" name="ingredient" value="'+ingredID+'">x</button></form>';
+        };
+      }
+
+      function addIngred(evt) {
+        evt.preventDefault();
+
+        var formInputs = {
+          "ingredient": $("#ingredient").val()
+        };
+
+        $.post("/add_ingred", formInputs, ingredAddResult);
+      }
+      $("#add_ingred").on("submit", addIngred);
+
+
+   //  </script>
 
 
 {% endblock %}

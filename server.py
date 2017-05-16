@@ -154,26 +154,36 @@ def add_ingred():
     if Ingredient.query.filter(Ingredient.ingred_name==ingredient).all():
         ingredient_id = Ingredient.query.filter(Ingredient.ingred_name==ingredient).one().ingred_id
         if UserIngredient.query.filter(UserIngredient.user_id==user_id, UserIngredient.ingred_id==ingredient_id).all():
-            flash(ingredient.title()+" already exists in your inventory.")  
+            flash(ingredient.title()+" already exists in your inventory.")
+            return jsonify({})  
         else:
             new_user_ingred = UserIngredient(ingred_id=ingredient_id, user_id=user.user_id) 
             db.session.add(new_user_ingred)
             db.session.commit()
+            ingred_id = str(new_ingred.ingred_id)
+            print ingred_id
             flash ("Added to inventory: "+ingredient.title())
-        return redirect("/ingred/"+str(user_id))
+            return jsonify({'ingredient': ingredient, 'ingred_id':ingred_id})
+
+        # return redirect("/ingred/"+str(user_id))
+        # return flash ("Added to inventory: "+ingredient)
 
     #If ingredient not in master ingredient list, add to master ingredients
     #and also add to user's ingredient inventory
     else:
         new_ingred = Ingredient(ingred_name=ingredient)
         db.session.add(new_ingred)
-        db.session.commit()
+        # db.session.commit()
+        db.session.flush()
         new_user_ingred = UserIngredient(ingred_id=new_ingred.ingred_id, user_id=user.user_id)
         db.session.add(new_user_ingred)
         db.session.commit()
+        ingred_id = str(new_ingred.ingred_id)
+        print ingred_id
         flash ("Added to inventory: "+ingredient) 
+        return jsonify({'ingredient': ingredient, 'ingred_id':ingred_id})
 
-    return redirect("/ingred/"+str(user_id))
+    # return redirect("/ingred/"+str(user_id))
 
 
 @app.route('/del_ingred', methods=['POST'])
@@ -182,8 +192,7 @@ def delete_ingred():
 
     user_id = session.get("user_id")
     user = User.query.filter(User.user_id==user_id).one()
-    ingred_id = request.form.get("ingredient")
-
+    ingred_id = int(request.form.get("ingredient"))
     ingred_to_del = UserIngredient.query.filter(UserIngredient.ingred_id==ingred_id, UserIngredient.user_id==user.user_id).one() 
     db.session.delete(ingred_to_del)
     db.session.commit()
@@ -215,7 +224,7 @@ def search_recipe():
 
 
 def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset):
-    """Make GET requests for recipe searches. Used in both /search_recipe and /search_more routes"""
+    """Make GET requests to API for recipe searches."""
 
     payload = {
             'addRecipeInformation': False, 
@@ -225,7 +234,7 @@ def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset
             'cuisine': cuisines,
             'intolerances': intolerances,
             'ranking': 1,
-            'offset': offset,
+            'offset': offset
         }
 
     recipes = requests.get(search_recipe_complex, headers=headers, params=payload)
