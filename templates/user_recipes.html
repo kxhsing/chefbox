@@ -5,6 +5,9 @@
 {% block content %}
 
     <h2>Recipe Box</h2>
+    <p>Mark completed recipes as "Cooked" to move them to your Chef Board, which will save each recipe and allow you to upload a photo and add a review!<br>
+      If you are no longer interested in a recipe, you can "Remove" it from your recipe box.
+    </p>
     {% if user.recipes %}
     <ul>
     {% for recipe in user.recipes %}
@@ -47,6 +50,13 @@
                         </form>
                         </td>
                       </tr>
+                      <tr>
+                        <td>
+                        <form action="/del_recipe" method="POST">
+                              <button type="submit" class="del-recipe" name="recipe_id" value="{{ recipe.recipe_id }}">Remove</button>
+                        </form>
+                        </td>
+                      </tr>
                 </table>
                 <p></p>
 
@@ -61,7 +71,34 @@
 
   <p><a href="/search_recipe">Search for recipes</a></p>
 
+  <script>
 
+       function deleteRecipe(evt) {
+          evt.preventDefault();
+
+          var thisButton = this;
+          var thisTable = $(thisButton).parentsUntil("table");
+
+
+          var formInputs = {
+            "recipe_id": this.value
+          };
+
+
+          $.post("/del_recipe", formInputs, function(){
+
+            alert("Recipe removed.");
+            $(thisTable).fadeOut();
+
+
+          });
+        }
+
+        $(".del-recipe").on('click', deleteRecipe);
+
+
+
+  </script>
 
 
 

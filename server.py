@@ -193,7 +193,6 @@ def delete_ingred():
     db.session.commit()
     # flash ("Ingredient removed.") 
 
-    # return redirect("/ingred/"+str(user_id))
     return jsonify({})
 
 
@@ -293,8 +292,7 @@ def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset
         request_result = (total_results, recipe_results_list)
         return request_result
     else:
-        request_result = None
-        return request_result
+        return None
 
 
 
@@ -433,6 +431,20 @@ def add_recipe():
     db.session.commit()
 
     # return redirect('/search_recipe')
+    return jsonify({})
+
+
+@app.route('/del_recipe', methods=['POST'])
+def delete_recipe():
+    """Delete recipe from user's recipe box"""
+
+    user_id = session.get("user_id")
+    user = User.query.filter(User.user_id==user_id).one()
+    recipe_id = int(request.form.get("recipe_id"))
+    recipe_to_del = UserRecipe.query.filter(UserRecipe.recipe_id==recipe_id, UserRecipe.user_id==user.user_id).one() 
+    db.session.delete(recipe_to_del)
+    db.session.commit()
+
     return jsonify({})
 
 
