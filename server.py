@@ -154,36 +154,31 @@ def add_ingred():
     if Ingredient.query.filter(Ingredient.ingred_name==ingredient).all():
         ingredient_id = Ingredient.query.filter(Ingredient.ingred_name==ingredient).one().ingred_id
         if UserIngredient.query.filter(UserIngredient.user_id==user_id, UserIngredient.ingred_id==ingredient_id).all():
-            flash(ingredient.title()+" already exists in your inventory.")
+            # flash(ingredient.title()+" already exists in your inventory.")
             return jsonify({})  
         else:
             new_user_ingred = UserIngredient(ingred_id=ingredient_id, user_id=user.user_id) 
             db.session.add(new_user_ingred)
             db.session.commit()
-            ingred_id = str(new_ingred.ingred_id)
+            ingred_id = str(new_user_ingred.ingred_id)
             print ingred_id
-            flash ("Added to inventory: "+ingredient.title())
+            # flash ("Added to inventory: "+ingredient.title())
             return jsonify({'ingredient': ingredient, 'ingred_id':ingred_id})
 
-        # return redirect("/ingred/"+str(user_id))
-        # return flash ("Added to inventory: "+ingredient)
 
     #If ingredient not in master ingredient list, add to master ingredients
     #and also add to user's ingredient inventory
     else:
         new_ingred = Ingredient(ingred_name=ingredient)
         db.session.add(new_ingred)
-        # db.session.commit()
         db.session.flush()
         new_user_ingred = UserIngredient(ingred_id=new_ingred.ingred_id, user_id=user.user_id)
         db.session.add(new_user_ingred)
         db.session.commit()
         ingred_id = str(new_ingred.ingred_id)
         print ingred_id
-        flash ("Added to inventory: "+ingredient) 
+        # flash ("Added to inventory: "+ingredient.title()) 
         return jsonify({'ingredient': ingredient, 'ingred_id':ingred_id})
-
-    # return redirect("/ingred/"+str(user_id))
 
 
 @app.route('/del_ingred', methods=['POST'])
@@ -196,9 +191,10 @@ def delete_ingred():
     ingred_to_del = UserIngredient.query.filter(UserIngredient.ingred_id==ingred_id, UserIngredient.user_id==user.user_id).one() 
     db.session.delete(ingred_to_del)
     db.session.commit()
-    flash ("Ingredient removed.") 
+    # flash ("Ingredient removed.") 
 
-    return redirect("/ingred/"+str(user_id))
+    # return redirect("/ingred/"+str(user_id))
+    return jsonify({})
 
 
 @app.route('/search_recipe')
@@ -237,6 +233,7 @@ def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset
             'offset': offset
         }
 
+    print payload
     recipes = requests.get(search_recipe_complex, headers=headers, params=payload)
     recipes = recipes.json()
 
@@ -257,7 +254,7 @@ def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset
             recipe_ids.append(recipe_id)
 
         recipe_ids_bulk = ','.join(recipe_ids)
-        print recipe_ids_bulk
+        # print recipe_ids_bulk
 
         bulk_recipe_results = requests.get(bulk_recipe_info, headers=headers, params={'ids': recipe_ids_bulk}) 
         bulk_recipe_results = bulk_recipe_results.json()
@@ -294,8 +291,10 @@ def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset
             recipe_results_list.append(recipe_info)
 
         request_result = (total_results, recipe_results_list)
-
-    return request_result    
+        return request_result
+    else:
+        request_result = None
+        return request_result
 
 
 
@@ -319,10 +318,13 @@ def request_recipe():
     session['diet'] = diet
     session['offset'] = offset
 
-    result = get_recipe_request(include_ingredients, cuisines, intolerances, diet, offset)
-
-    recipe_results_list = result[1]
-    total_results = result[0]
+    result = get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset)
+    if result:
+        recipe_results_list = result[1]
+        total_results = result[0]
+    else:
+        recipe_results_list = []
+        total_results = 0
 
     return render_template("recipe_results.html", user=user, recipe_results_list=recipe_results_list, total_results=total_results)
 
@@ -347,10 +349,14 @@ def search_more():
     intolerances = session.get("intolerances")
 
 
-    result = get_recipe_request(include_ingredients, cuisines, intolerances, diet, offset)
+    result = get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset)
 
-    recipe_results_list = result[1]
-    total_results = result[0]
+    if result:
+        recipe_results_list = result[1]
+        total_results = result[0]
+    else:
+        recipe_results_list = []
+        total_results = 0
 
     return render_template("recipe_results.html", user=user, recipe_results_list=recipe_results_list, total_results=total_results)
 
@@ -426,7 +432,8 @@ def add_recipe():
 
     db.session.commit()
 
-    return redirect('/search_recipe')
+    # return redirect('/search_recipe')
+    return jsonify({})
 
 
 @app.route('/review_recipe', methods=["POST"])

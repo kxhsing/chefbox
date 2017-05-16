@@ -47,7 +47,7 @@
                     <tr>
                       <td>
                       <form action="/add_recipe" method="POST">
-                            <button type="submit" name="recipe_id" value="{{ recipe[0] }}">Save Recipe</button>
+                            <button type="submit" class="add-recipe" name="recipe_id" value="{{ recipe[0] }}">Save Recipe</button>
                       </form>
                       </td>
                     </tr>
@@ -69,7 +69,34 @@
   <p><a href="/search_recipe">New Recipe Search</a></p>
 
 
+  <script>
 
+       function addRecipe(evt) {
+          evt.preventDefault();
+          // debugger
+          var thisButton = this;
+          var thisTable = $(thisButton).parentsUntil("table");
+
+
+          var formInputs = {
+            "recipe_id": this.value
+          };
+
+
+          $.post("/add_recipe", formInputs, function(){
+
+            alert("Recipe saved!");
+            $(thisTable).fadeOut();
+
+
+          });
+        }
+
+        $(".add-recipe").on('click', addRecipe);
+
+
+
+  </script>
 
 
 {% endblock %}

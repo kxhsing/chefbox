@@ -9,11 +9,11 @@
     <ul id="ingred_list">
 
     {% for ingredient in user.ingredients %}
-        <li>{{ ingredient.ingred_name.title() }}</li>
+        <li id="ingredient-{{ingredient.ingred_id}}">{{ ingredient.ingred_name.title() }}</li>
 
 
         <form action="/del_ingred" method="post">
-          <button type="submit" name="ingredient" value="{{ ingredient.ingred_id }}">x</button>
+          <button type="submit" class="delete-button" name="ingredient" value="{{ ingredient.ingred_id }}">x</button>
         </form>
     {% endfor %}
       </ul>
@@ -24,7 +24,7 @@
 
 
     <h3>Add Ingredient</h3>
-      <form action="/add_ingred" method="POST" id="add_ingred">
+      <form action="/add_ingred" method="POST" id="add-ingred">
         <input type="text" name="ingredient" id="ingredient">
         <input type="submit" value="Add">
       </form>
@@ -33,6 +33,7 @@
 
     <script>
 
+      // Add ingredient to inventory; stays on current page
       function ingredAddResult(result) {
         console.log(result);
         var ingredList = $("#ingred_list");
@@ -40,7 +41,12 @@
         if (ingredientName) {
         var ingredID = result.ingred_id;
         console.log(ingredID);
-        ingredList[0].innerHTML = ingredList.html() + '<li>'+ingredientName+'</li> <form action="/del_ingred" method="post"> <button type="submit" name="ingredient" value="'+ingredID+'">x</button></form>';
+        ingredList[0].innerHTML = ingredList.html() + '<li>'+ingredientName+'</li> <form action="/del_ingred" method="post"> <button type="submit" class="delete-button" name="ingredient" class="delete-button" value="'+ingredID+'">x</button></form>';
+        alert("Added to inventory: " + ingredientName);
+        // $(".delete-button").on('click', delIngred);
+        }
+        else {
+          alert("Ingredient exists already");
         };
       }
 
@@ -52,11 +58,43 @@
         };
 
         $.post("/add_ingred", formInputs, ingredAddResult);
+
       }
-      $("#add_ingred").on("submit", addIngred);
+
+      $("#add-ingred").on("submit", addIngred);
 
 
-   //  </script>
+      // Delete ingredient from inventory; stays on current page
+      function delIngred(evt) {
+        console.log('in delIngred');
+        evt.preventDefault();
+
+
+        var formInputs = {
+          "ingredient": this.value
+        };
+
+        var thisButton = this;
+        var thisForm = $(thisButton).parent();
+        var thisButtonIngred = thisForm.prev();
+
+
+        $.post("/del_ingred", formInputs, function(){
+          thisButton.remove();
+          thisButtonIngred.remove();
+
+          alert("Removed from inventory: "+ $(thisButtonIngred).text());
+
+        });
+      }
+
+      $("#ingred_list").on('click', ".delete-button", delIngred);
+
+
+      
+
+
+    </script>
 
 
 {% endblock %}
