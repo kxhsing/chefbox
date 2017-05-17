@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Chef Board{% endblock %}
+
+{% block content %}
+
+    <h2>Chef Board</h2>
+    {% if user.reviews %}
+    <p>Upload and review your completed recipes below
+    </p>
+    <ul>
+    {% for review in user.reviews %}
+      <table>
+                    <tr>
+                      <th>{{ review.recipe.title }}</th>
+                    </tr>
+                    <tr>
+                      <td>
+                      <form action="/upload_photo" method="POST">
+                            <button type="submit" name="recipe_id" value="{{ review.recipe.recipe_id }}">Upload Photo</button>
+                      </form>
+                      <!-- Photo via {{ user.firstname }} {{ user.lastname }} -->
+                      </td>
+                      </tr>
+                    <tr>
+                      <td>Recipe via {% if review.recipe.url and review.recipe.source_name %}<a href="{{ review.recipe.url }}"> {{ review.recipe.source_name }} </a> 
+                              {% elif review.recipe.url %}
+                                <a href="{{ review.recipe.url }}"> [Original Source] </a> 
+                              {% else %} 
+                                {{ review.recipe.source_name }}
+                              {% endif %}
+                          </td>
+                      </tr>
+                      <tr>
+                        <td>Ingredients<br>
+                          <ul>
+                          {% for ingredient in review.recipe.ingredient_info %}
+                              <li>{{ ingredient.ingred_info }}</li>
+                          {% endfor %}
+                        </ul>
+                        </td>
+                      </tr>
+                        <tr>
+                          <td>Instructions<br>
+                            {% set instruction_list = review.recipe.instructions[2:-2].split("\",\"") %}
+                            <ol>
+                            {% for instruction in instruction_list %}
+                              <li>{{ instruction }}</li>
+                            {% endfor %}
+                            </ol>
+                          </td>
+                        </tr>
+                       <tr> 
+                        <td>
+                        <form action="/del_recipe" method="POST">
+                              <button type="submit" class="del-recipe" name="recipe_id" value="{{ review.recipe.recipe_id }}">Remove</button>
+                        </form>
+                        </td>
+                      </tr>
+                </table>
+                <p></p>
+
+      {% endfor %}
+        </ul>
+
+
+    {% else %}
+      <p>There are currently no completed recipes from your recipe box. Get cooking!</p>
+
+    {% endif %}
+
+  <p>Visit my <a href="/recipes/{{ user.user_id }}">Recipe Box</a></p>
+
+  <script>
+
+       function deleteRecipe(evt) {
+          evt.preventDefault();
+
+          var thisButton = this;
+          var thisTable = $(thisButton).parentsUntil("table");
+
+
+          var formInputs = {
+            "recipe_id": this.value
+          };
+
+
+          $.post("/del_recipe", formInputs, function(){
+
+            alert("Recipe removed.");
+            $(thisTable).fadeOut();
+
+
+          });
+        }
+
+        $(".del-recipe").on('click', deleteRecipe);
+
+
+
+  </script>
+
+
+
+{% endblock %}
+
+
+
+

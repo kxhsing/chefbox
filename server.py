@@ -141,6 +141,16 @@ def show_user_ingredients(user_id):
     return render_template("user_ingred.html", user=user)
 
 
+@app.route('/board/<user_id>')
+def show_user_board(user_id):
+    """Show user's board of completed recipes"""
+    
+    user_id = session.get("user_id")
+    user = User.query.filter(User.user_id==user_id).one()
+
+    return render_template("user_board.html", user=user)
+
+
 @app.route('/add_ingred', methods=["POST"])
 def add_ingred():
     """Add ingredient to user's inventory and master inventory if not already
@@ -234,6 +244,10 @@ def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset
 
     print payload
     recipes = requests.get(search_recipe_complex, headers=headers, params=payload)
+
+    if recipes.status_code != requests.codes.ok: #need 504 error to happen to confirm if this works
+        return None
+
     recipes = recipes.json()
 
     recipe_formatted = json.dumps(recipes, indent=4, sort_keys=True) #formatting the responses nicely in terminal
@@ -241,16 +255,15 @@ def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset
 
     recipe_results_list = [] #list of recipes to pass to recipe_results.html
 
+
+
     recipe_results = recipes['results'] 
     total_results = recipes['totalResults']
+
     if recipe_results: #checking if any results returned. 
         # print recipe_results
 
-        recipe_ids = []
-
-        for recipe in recipe_results: #fetch each recipe id, add to id list and run in "Get Bulk Recipe Info" endpoint
-            recipe_id = str(recipe['id'])
-            recipe_ids.append(recipe_id)
+        recipe_ids = [str(recipe['id']) for recipe in recipe_results] #fetch each recipe id, add to id list and run in "Get Bulk Recipe Info" endpoint
 
         recipe_ids_bulk = ','.join(recipe_ids)
         # print recipe_ids_bulk
@@ -430,7 +443,6 @@ def add_recipe():
 
     db.session.commit()
 
-    # return redirect('/search_recipe')
     return jsonify({})
 
 
@@ -456,12 +468,13 @@ def review_recipe():
     cooked_recipe = UserRecipe.query.filter(UserRecipe.user_id==user_id, UserRecipe.recipe_id==recipe_id).one()
     cooked_recipe.cooked = True #does this need to be committed?
 
-    new_review = Review(recipe_id=recipe_id, user_id=user_id)
-    db.session.add(new_review)
-    db.session.commit()
+    if not Review.query.filter(Review.user_id==user_id, Review.recipe_id==recipe_id).all():
+        new_review = Review(recipe_id=recipe_id, user_id=user_id)
+        db.session.add(new_review)
+        db.session.commit()
 
+    return jsonify({})
 
-    return render_template("user_board.html", user=user)
 
 
 if __name__ == "__main__":

@@ -35,7 +35,7 @@
                       </tr>
                         <tr>
                           <td>Instructions<br>
-                            {% set instruction_list = recipe.instructions[2:-3].split("\",\"") %}
+                            {% set instruction_list = recipe.instructions[2:-2].split("\",\"") %}
                             <ol>
                             {% for instruction in instruction_list %}
                               <li>{{ instruction }}</li>
@@ -46,7 +46,7 @@
                       <tr>
                         <td>
                         <form action="/review_recipe" method="POST">
-                              <button type="submit" name="recipe_id" value="{{ recipe.recipe_id }}">Cooked</button>
+                              <button type="submit" class="review-recipe" name="recipe_id" value="{{ recipe.recipe_id }}">Cooked</button>
                         </form>
                         </td>
                       </tr>
@@ -73,6 +73,7 @@
 
   <script>
 
+       //Remove recipe from user's recipe box
        function deleteRecipe(evt) {
           evt.preventDefault();
 
@@ -95,6 +96,31 @@
         }
 
         $(".del-recipe").on('click', deleteRecipe);
+
+
+        //Mark recipe as cooked and move to Chef Board
+       function reviewRecipe(evt) {
+          evt.preventDefault();
+
+          var thisButton = this;
+          var thisTable = $(thisButton).parentsUntil("table");
+
+
+          var formInputs = {
+            "recipe_id": this.value
+          };
+
+
+          $.post("/review_recipe", formInputs, function(){
+
+            alert("Recipe moved to your Chef Board. Upload a photo & review the recipe there.");
+            $(thisTable).fadeOut();
+
+
+          });
+        }
+
+        $(".review-recipe").on('click', reviewRecipe);
 
 
 
