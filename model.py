@@ -70,7 +70,7 @@ class Recipe(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
         return "<Recipe recipe_id={} title={}>".format(self.recipe_id,
-                                                       self.title)
+                                                       self.title.encode('utf-8'))
 
 
 class RecipeIngredient(db.Model):

@@ -6,7 +6,7 @@
 
     <h2>Chef Board</h2>
     {% if user.reviews %}
-    <p>Upload and review your completed recipes below
+    <p>Upload and review your completed recipes below!
     </p>
     <ul>
     {% for review in user.reviews %}
@@ -23,9 +23,9 @@
                       </td>
                       </tr>
                     <tr>
-                      <td>Recipe via {% if review.recipe.url and review.recipe.source_name %}<a href="{{ review.recipe.url }}"> {{ review.recipe.source_name }} </a> 
+                      <td>Recipe via {% if review.recipe.url and review.recipe.source_name %}<a href="{{ review.recipe.url }}" target="_blank"> {{ review.recipe.source_name }} </a> 
                               {% elif review.recipe.url %}
-                                <a href="{{ review.recipe.url }}"> [Original Source] </a> 
+                                <a href="{{ review.recipe.url }}" target="_blank"> [Original Source] </a> 
                               {% else %} 
                                 {{ review.recipe.source_name }}
                               {% endif %}
@@ -69,7 +69,7 @@
 
     {% endif %}
 
-  <p>Visit my <a href="/recipes/{{ user.user_id }}">Recipe Box</a></p>
+  <p><a href="/recipes/{{ user.user_id }}">Recipe Box</a></p>
 
   <script>
 

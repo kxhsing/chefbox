@@ -18,9 +18,9 @@
                       <td> <img src="{{ recipe[4] }}"> </td>
                     </tr>
                     <tr>
-                      <td> via {% if recipe[3] and recipe[2] %}<a href="{{ recipe[3]}}"> {{ recipe[2] }} </a> 
+                      <td> via {% if recipe[3] and recipe[2] %}<a href="{{ recipe[3]}}" target="_blank"> {{ recipe[2] }} </a> 
                               {% elif recipe[3] %}
-                                <a href="{{ recipe[3]}}"> [Original Source] </a> 
+                                <a href="{{ recipe[3]}}" target="_blank"> [Original Source] </a> 
                               {% else %} 
                                 {{ recipe[2] }}
                               {% endif %}

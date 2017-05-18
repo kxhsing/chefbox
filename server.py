@@ -14,6 +14,8 @@ import os
 
 import json
 
+import bcrypt
+
 
 app = Flask(__name__)
 
@@ -66,11 +68,13 @@ def register_complete():
     email = request.form.get("email").lower()
     password = request.form.get("password")
 
+    hashed_pw = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
+
     if not User.query.filter(User.email==email).all():
         new_user = User(firstname=firstname, 
                         lastname=lastname, 
                         email=email, 
-                        password=password)
+                        password=hashed_pw)
 
         db.session.add(new_user)
         db.session.commit()
@@ -92,7 +96,7 @@ def login_check():
         return redirect("/")
     else:
         user = User.query.filter(User.email==email).one()
-        if password==user.password:
+        if bcrypt.checkpw(password.encode('utf8'), user.password.encode('utf8')):
             session['user_id'] = user.user_id 
             flash("You are logged in")
             return redirect("/users/"+str(user.user_id))
@@ -116,6 +120,7 @@ def logout():
 def show_user_info(user_id):
     """Show user's dashboard, which houses linkes to saved recipes and ingredients"""
 
+    user_id = session.get("user_id")
     user = User.query.filter(User.user_id==user_id).one()
 
     return render_template("dashboard.html", user=user)
@@ -128,7 +133,15 @@ def show_user_recipes(user_id):
     user_id = session.get("user_id")
     user = User.query.filter(User.user_id==user_id).one()
 
-    return render_template("user_recipes.html", user=user)
+    #Creating list of recipes that have not been cooked before to display in Recipe Box for user
+    recipes_to_cook = UserRecipe.query.filter(UserRecipe.user_id==user_id, UserRecipe.cooked==False).all() 
+    recipes_list = []
+    for recipe in recipes_to_cook:
+        recipe_id = recipe.recipe_id
+        recipe_to_cook = Recipe.query.filter(Recipe.recipe_id==recipe_id).one()
+        recipes_list.append(recipe_to_cook)
+
+    return render_template("user_recipes.html", user=user, recipes_list=recipes_list)
 
 
 @app.route('/ingred/<user_id>')
@@ -160,7 +173,7 @@ def add_ingred():
     user = User.query.filter(User.user_id==user_id).one()
     ingredient = request.form.get("ingredient").lower()
 
-    #Check if ingredient is in master list is in user's inventory
+    #Check if ingredient is in master list and then if it is in user's inventory
     if Ingredient.query.filter(Ingredient.ingred_name==ingredient).all():
         ingredient_id = Ingredient.query.filter(Ingredient.ingred_name==ingredient).one().ingred_id
         if UserIngredient.query.filter(UserIngredient.user_id==user_id, UserIngredient.ingred_id==ingredient_id).all():
