@@ -9,60 +9,64 @@
       If you are no longer interested in a recipe, you can "Remove" it from your recipe box.
     </p>
     {% if user.recipes %}
-    <ul>
-    {% for recipe in recipes_list %}
-      <table>
-                    <tr>
-                      <th>{{ recipe.title }}</th>
-                    </tr>
-                    <tr>
-                      <td> via {% if recipe.url and recipe.source_name %}<a href="{{ recipe.url }}" target="_blank"> {{ recipe.source_name }} </a> 
-                              {% elif recipe.url %}
-                                <a href="{{ recipe.url }}" target="_blank"> [Original Source] </a> 
-                              {% else %} 
-                                {{ recipe.source_name }}
-                              {% endif %}
-                          </td>
-                      </tr>
-                      <tr>
-                        <td>Ingredients<br>
-                          <ul>
-                          {% for ingredient in recipe.ingredient_info %}
-                              <li>{{ ingredient.ingred_info }}</li>
-                          {% endfor %}
-                        </ul>
-                        </td>
-                      </tr>
-                        <tr>
-                          <td>Instructions<br>
-                            {% set instruction_list = recipe.instructions[2:-2].split("\",\"") %}
-                            <ol>
-                            {% for instruction in instruction_list %}
-                              <li>{{ instruction }}</li>
-                            {% endfor %}
-                            </ol>
-                          </td>
-                        </tr>
-                      <tr>
-                        <td>
-                        <form action="/review_recipe" method="POST">
-                              <button type="submit" class="review-recipe" name="recipe_id" value="{{ recipe.recipe_id }}">Cooked</button>
-                        </form>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                        <form action="/del_recipe" method="POST">
-                              <button type="submit" class="del-recipe" name="recipe_id" value="{{ recipe.recipe_id }}">Remove</button>
-                        </form>
-                        </td>
-                      </tr>
-                </table>
-                <p></p>
+      <ul>
+        {% if recipes_list %}
+          {% for recipe in recipes_list %}
+            <table>
+                          <tr>
+                            <th>{{ recipe.title }}</th>
+                          </tr>
+                          <tr>
+                            <td> via {% if recipe.url and recipe.source_name %}<a href="{{ recipe.url }}" target="_blank"> {{ recipe.source_name }} </a> 
+                                    {% elif recipe.url %}
+                                      <a href="{{ recipe.url }}" target="_blank"> [Original Source] </a> 
+                                    {% else %} 
+                                      {{ recipe.source_name }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                              <td>Ingredients<br>
+                                <ul>
+                                {% for ingredient in recipe.ingredient_info %}
+                                    <li>{{ ingredient.ingred_info }}</li>
+                                {% endfor %}
+                              </ul>
+                              </td>
+                            </tr>
+                              <tr>
+                                <td>Instructions<br>
+                                  {% set instruction_list = recipe.instructions[2:-2].split("\",\"") %}
+                                  <ol>
+                                  {% for instruction in instruction_list %}
+                                    <li>{{ instruction }}</li>
+                                  {% endfor %}
+                                  </ol>
+                                </td>
+                              </tr>
+                            <tr>
+                              <td>
+                              <form action="/review_recipe" method="POST">
+                                    <button type="submit" class="review-recipe" name="recipe_id" value="{{ recipe.recipe_id }}">Cooked</button>
+                              </form>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                              <form action="/del_recipe" method="POST">
+                                    <button type="submit" class="del-recipe" name="recipe_id" value="{{ recipe.recipe_id }}">Remove</button>
+                              </form>
+                              </td>
+                            </tr>
+                      </table>
+                      <p></p>
 
-      {% endfor %}
+            {% endfor %}
+
+      {% else %}  
         </ul>
-
+        <p>There are currently no recipes saved in your recipe box.</p>
+      {% endif%}
 
     {% else %}
       <p>There are currently no recipes saved in your recipe box.</p>
