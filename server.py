@@ -404,11 +404,18 @@ configure_uploads(app, photos)
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
-    print request.files
-    if request.method == 'POST' and 'photo' in request.files:
-        filename = photos.save(request.files['photo'])
-        flash("Photo saved.")
-    return redirect('/board/<user_id>')
+    user_id = session.get("user_id")
+    photo = request.files['photo']
+
+    try:    
+        if request.method == 'POST' and 'photo' in request.files:
+            filename = photos.save(photo)
+            flash("Photo saved.")
+    except:
+        flash("Not a valid photo file. Please try again.")
+        return redirect('/board/'+str(user_id))
+
+    return redirect('/board/'+str(user_id))
 
 #access image path in html: <img src="/static/photos/{{ filename}}">
 
