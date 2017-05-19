@@ -6,7 +6,7 @@ import json
 
 #####SPOONACULAR ENDPOINTS - all GET requests
 search_recipe_complex = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/searchComplex"
-get_recipe_info = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/{}/information"
+get_recipe_info_endpoint = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/{}/information"
 bulk_recipe_info = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/informationBulk"
 auto_complete_ingred = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/food/ingredients/autocomplete"
 
@@ -97,4 +97,13 @@ def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset
         return request_result
     else:
         return None
+
+
+def get_recipe_info(recipe_id):
+    """Make GET requests to API for recipe searches."""
+    
+    saved_recipe = requests.get(get_recipe_info_endpoint.format(recipe_id), headers=headers)
+    saved_recipe = saved_recipe.json() #dict
+
+    return saved_recipe
 

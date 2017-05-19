@@ -19,7 +19,7 @@ import bcrypt
 
 from model import User, Recipe, Ingredient, RecipeIngredient, UserIngredient, UserRecipe, Review, connect_to_db, db
 
-from spoonacular import get_recipe_request
+from spoonacular import get_recipe_request, get_recipe_info
 
 
 app = Flask(__name__)
@@ -303,15 +303,14 @@ def add_recipe():
     recipe_id = request.form.get('recipe_id')
     print recipe_id
 
-    saved_recipe = requests.get(get_recipe_info.format(recipe_id), headers=headers)
-    saved_recipe = saved_recipe.json() #dict
-    print saved_recipe
+    saved_recipe = get_recipe_info(recipe_id)
 
+    # print saved_recipe
 
     saved_recipe_title = saved_recipe['title'].encode('utf-8')
     saved_recipe_source_name = saved_recipe.get('sourceName')
     saved_recipe_source_url = saved_recipe.get('sourceUrl')
-
+    #get recipe image??
 
     steps = saved_recipe['analyzedInstructions'][0]['steps']
     step_instructions = [] #create list for all instruction steps
@@ -399,25 +398,32 @@ def review_recipe():
     return jsonify({})
 
 
-photos = UploadSet('photos', IMAGES)
+photos = UploadSet("photos", IMAGES)
 configure_uploads(app, photos)
 
-@app.route('/upload', methods=['GET', 'POST'])
+@app.route('/upload', methods=["GET", "POST"])
 def upload():
     user_id = session.get("user_id")
-    photo = request.files['photo']
+    photo = request.files["photo"]
+    recipe_id = request.form.get("recipe_id")
+    print recipe_id
 
     try:    
-        if request.method == 'POST' and 'photo' in request.files:
+        if request.method == "POST" and "photo" in request.files:
             filename = photos.save(photo)
             flash("Photo saved.")
     except:
         flash("Not a valid photo file. Please try again.")
         return redirect('/board/'+str(user_id))
 
+    #Add photo url to Review object
+    review = Review.query.filter(Review.user_id==user_id, Review.recipe_id==recipe_id).one()
+    review.photo_url = filename
+    db.session.commit()
+
+
     return redirect('/board/'+str(user_id))
 
-#access image path in html: <img src="/static/photos/{{ filename}}">
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@
 
     <h2>Chef Board</h2>
     {% if user.reviews %}
-    <p>Upload and review your completed recipes below!
+    <p>Upload a photo and write a review of your completed recipes below!
     </p>
     <ul>
     {% for review in user.reviews %}
@@ -16,11 +16,15 @@
                     </tr>
                     <tr>
                       <td>
+                        {% if review.photo_url %}
+                          <img src="/static/photos/{{ review.photo_url }}"><br>
+                          Photo via {{ user.firstname }} {{ user.lastname }}
+                        {% endif %}
                         <form method="POST" enctype="multipart/form-data" action="{{ url_for('upload') }}">
                           <input type="file" name="photo"><br>
+                          <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
                           <input type="submit" value="Upload Photo">
                         </form>
-                      <!-- Photo via {{ user.firstname }} {{ user.lastname }} -->
                       </td>
                       </tr>
                     <tr>
@@ -74,7 +78,8 @@
 
   <script>
 
-       function deleteRecipe(evt) {
+        //Remove recipe from UserRecipe
+        function deleteRecipe(evt) {
           evt.preventDefault();
 
           var thisButton = this;
@@ -96,6 +101,8 @@
         }
 
         $(".del-recipe").on('click', deleteRecipe);
+
+
 
 
 
