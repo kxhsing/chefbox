@@ -4,6 +4,9 @@ from jinja2 import StrictUndefined
 
 from flask import (Flask, render_template, redirect, request, flash,
                     session, jsonify, url_for)
+
+from flask_uploads import UploadSet, IMAGES, configure_uploads
+
 from flask_debugtoolbar import DebugToolbarExtension
 
 import requests
@@ -19,8 +22,6 @@ from model import User, Recipe, Ingredient, RecipeIngredient, UserIngredient, Us
 from spoonacular import get_recipe_request
 
 
-
-
 app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
@@ -31,6 +32,8 @@ app.secret_key = "secretsecretsecrets"
 # error.
 app.jinja_env.undefined = StrictUndefined
 
+UPLOAD_FOLDER = "static/photos/"
+app.config['UPLOADED_PHOTOS_DEST'] = UPLOAD_FOLDER
 
 
 @app.route('/')
@@ -395,6 +398,19 @@ def review_recipe():
 
     return jsonify({})
 
+
+photos = UploadSet('photos', IMAGES)
+configure_uploads(app, photos)
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    print request.files
+    if request.method == 'POST' and 'photo' in request.files:
+        filename = photos.save(request.files['photo'])
+        flash("Photo saved.")
+    return redirect('/board/<user_id>')
+
+#access image path in html: <img src="/static/photos/{{ filename}}">
 
 
 if __name__ == "__main__":

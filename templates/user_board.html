@@ -16,9 +16,10 @@
                     </tr>
                     <tr>
                       <td>
-                      <form action="/upload_photo" method="POST">
-                            <button type="submit" name="recipe_id" value="{{ review.recipe.recipe_id }}">Upload Photo</button>
-                      </form>
+                        <form method="POST" enctype="multipart/form-data" action="{{ url_for('upload') }}">
+                          <input type="file" name="photo"><br>
+                          <input type="submit" value="Upload Photo">
+                        </form>
                       <!-- Photo via {{ user.firstname }} {{ user.lastname }} -->
                       </td>
                       </tr>

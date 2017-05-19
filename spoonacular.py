@@ -75,7 +75,7 @@ def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset
             step_instructions = [] #create list for all instruction steps
 
             for step in steps:
-                if len(step['step']) > 1:
+                if len(step['step']) > 2:
                     step_instructions.append(step['step'])
 
             ingredients = recipe['extendedIngredients'] # list of dictionaries. each dict contains info about all ingredients, including 'name', 'amount', 'unit'
