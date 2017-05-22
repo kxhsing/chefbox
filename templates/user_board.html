@@ -15,27 +15,54 @@
                       <th>{{ review.recipe.title }}</th>
                     </tr>
                     <tr>
+                      <td>Recipe via {% if review.recipe.url and review.recipe.source_name %}<a href="{{ review.recipe.url }}" target="_blank"> {{ review.recipe.source_name }} </a> 
+                        {% elif review.recipe.url %}
+                          <a href="{{ review.recipe.url }}" target="_blank"> [Original Source] </a> 
+                        {% else %} 
+                          {{ review.recipe.source_name }}
+                        {% endif %}
+                      </td>
+                    </tr>
+                    <tr>
                       <td>
                         {% if review.photo_url %}
                           <img src="/static/photos/{{ review.photo_url }}"><br>
-                          Photo via {{ user.firstname }} {{ user.lastname }}
+                          Photo by {{ user.firstname }} {{ user.lastname }}<br>
                         {% endif %}
-                        <form method="POST" enctype="multipart/form-data" action="{{ url_for('upload') }}">
+                        <button type="button" class="upload-button">
+                          {% if review.photo_url %}Update Photo
+                          {% else %}Upload Photo
+                          {% endif %}
+                        </button>
+                        <form method="POST" enctype="multipart/form-data" action="{{ url_for('upload') }}" class="upload-form">
                           <input type="file" name="photo"><br>
                           <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
-                          <input type="submit" value="Upload Photo">
+                          <input type="submit">
                         </form>
                       </td>
                       </tr>
-                    <tr>
-                      <td>Recipe via {% if review.recipe.url and review.recipe.source_name %}<a href="{{ review.recipe.url }}" target="_blank"> {{ review.recipe.source_name }} </a> 
-                              {% elif review.recipe.url %}
-                                <a href="{{ review.recipe.url }}" target="_blank"> [Original Source] </a> 
-                              {% else %} 
-                                {{ review.recipe.source_name }}
-                              {% endif %}
-                          </td>
+                      <tr> 
+                        <td>
+                          {% if not review.review %}
+                          <button type="button" class="review-button">Review Recipe</button><br>
+                          <form action="/write_review" method="POST" class="review-form" id="{{ review.review_id }}"> 
+                            <textarea form="{{ review.review_id }}" name="review"> </textarea><br>
+                            <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
+                            <input type="submit" value="Submit">
+                          </form>
+                          {% else %}
+                            Review<br>
+                            <div class="existing-review">{{ review.review }}<br>
+                            </div>
+                              <form action="/edit_review" method="POST" class="editable-review"><textarea form="editable-review" name="review">{{ review.review }}</textarea><br>
+                                <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
+                                <input type="submit" class="edited-review"></form>
+
+                            <button type="button" class="edit-review-btn">Edit Review</button>
+                          {% endif %}
+                        </td>
                       </tr>
+
                       <tr>
                         <td>Ingredients<br>
                           <ul>
@@ -55,13 +82,7 @@
                             </ol>
                           </td>
                         </tr>
-                       <tr> 
-                        <td>
-                        <form action="/del_recipe" method="POST">
-                              <button type="submit" class="del-recipe" name="recipe_id" value="{{ review.recipe.recipe_id }}">Remove</button>
-                        </form>
-                        </td>
-                      </tr>
+
                 </table>
                 <p></p>
 
@@ -102,7 +123,61 @@
 
         $(".del-recipe").on('click', deleteRecipe);
 
+        //Display upload photo form on click 
+        $(".upload-button").on("click", function(){
+          var thisButton = this;
+          var thisForm = thisButton.nextElementSibling;
+          $(thisForm).toggle();
+          });
 
+        //Display review form on click 
+        $(".review-button").on("click", function(){
+          var thisButton = this;
+          var thisForm = thisButton.nextElementSibling.nextElementSibling;
+          $(thisForm).toggle();
+          });
+
+        //Make existing recipe review editable
+        $(".edit-review-btn").on("click", function(){
+          var thisButton = this;
+          var thisForm = thisButton.previousElementSibling; //form
+          var thisDiv = thisForm.previousElementSibling;
+
+          $(thisForm).toggle();
+          $(thisDiv).toggle();
+          if (thisButton.innerText=="Edit Review") {
+            thisButton.innerText = "Cancel";
+          }
+          else {
+            thisButton.innerText = "Edit Review";
+          }
+
+
+          });
+
+
+
+        //AJAX post request to submit edited review
+        // function updateReview(evt) {
+        // evt.preventDefault();
+
+        // var thisButton = this;
+        // debugger
+        // var thisTable = $(thisButton).parentsUntil("table");
+
+
+        // var formInputs = {
+        //   "recipe_id": this.value
+        // };
+
+
+        // $.post("/edit_review", formInputs, function(){
+
+
+        // });
+        // }
+
+        // $(".edited-review").on('click', updateReview);
 
 
 

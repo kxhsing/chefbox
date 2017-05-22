@@ -6,10 +6,16 @@
 
 
 <h2>Sign up</h2>
-<p><a href="/register">Register</a></p>
+<form action="/register" method="POST">
+    First Name: <input type="text" name="firstname" id="firstname"><br>
+    Last Name: <input type="text" name="lastname" id="lastname"><br>
+    Email Address: <input type="email" name="email" id="email"><br>
+    Password: <input type="password" name="password" id="password"><br>
+    <input type="submit" name="submit">
+</form>
 
 
-<h2>Login</h2>
+<h2>Log In</h2>
 <form action="/login" method="POST">
   Email Address: <input type="email" name="email" id="email"><br>
   Password: <input type="password" name="password" id="password"><br>

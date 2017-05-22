@@ -6,3 +6,4 @@ project-flow.txt
 secrets.sh
 reciperesults-parsing.py
 *.json
+static/photos

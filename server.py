@@ -388,12 +388,13 @@ def review_recipe():
     user = User.query.filter(User.user_id==user_id).one()
     recipe_id = request.form.get("recipe_id") 
     cooked_recipe = UserRecipe.query.filter(UserRecipe.user_id==user_id, UserRecipe.recipe_id==recipe_id).one()
-    cooked_recipe.cooked = True #does this need to be committed?
+    cooked_recipe.cooked = True 
 
     if not Review.query.filter(Review.user_id==user_id, Review.recipe_id==recipe_id).all():
         new_review = Review(recipe_id=recipe_id, user_id=user_id)
         db.session.add(new_review)
-        db.session.commit()
+    
+    db.session.commit()
 
     return jsonify({})
 
@@ -406,7 +407,7 @@ def upload():
     user_id = session.get("user_id")
     photo = request.files["photo"]
     recipe_id = request.form.get("recipe_id")
-    print recipe_id
+    # print recipe_id
 
     try:    
         if request.method == "POST" and "photo" in request.files:
@@ -423,6 +424,40 @@ def upload():
 
 
     return redirect('/board/'+str(user_id))
+
+
+@app.route('/write_review', methods=["POST"])
+def write_review():
+    user_id = session.get("user_id")
+    recipe_id = request.form.get("recipe_id")
+    submitted_review = request.form.get("review")
+
+    this_review = Review.query.filter(Review.user_id==user_id, Review.recipe_id==recipe_id).one()
+    this_review.review = submitted_review
+    db.session.commit()
+
+
+    return redirect('/board/'+str(user_id))
+
+
+@app.route('/edit_review', methods=["POST"])
+def edit_review():
+    user_id = session.get("user_id")
+    recipe_id = request.form.get("recipe_id")
+    print recipe_id
+    edited_review = request.form.get("review")
+    print edited_review
+
+    user_review = Review.query.filter(Review.user_id==user_id, Review.recipe_id==recipe_id).one()
+    user_review.review = edited_review
+
+    db.session.commit()
+
+    return redirect('/board/'+str(user_id))
+    # return jsonify({'recipe_id': recipe_id, 'review':review})
+
+
+
 
 
 

@@ -150,14 +150,37 @@ class Review(db.Model):
         return "<Review review_id={} recipe_id={} user_id={}>".format(self.review_id,
                                                        self.recipe_id, self.user_id)
 
+
+
+##############################################################################
+# For testing
+
+def example_data():
+    """Create some sample data."""
+
+    # In case this is run more than once, empty out existing data
+    # Employee.query.delete()
+    # Department.query.delete()
+
+    # Add sample users
+    karen = User(firstname='Karen', lastname='Hsing', email='karen@gmail.com', password='cookies')
+    jesse = User(firstname='Jesse', lastname='Boeuf', email='jesse@gmail.com', password='noodles')
+    cora = User(firstname='Cora', lastname='Car', email='cora@gmail.com', password='corolla')
+
+
+    db.session.add_all([karen, jesse, cora])
+    db.session.commit()
+
+
+
 ##############################################################################
 # Helper functions
 
-def connect_to_db(app):
+def connect_to_db(app, db_uri="postgresql:///recipes"):
     """Connect the database to our Flask app."""
 
     # Configure to use our PstgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///recipes' 
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri 
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.app = app
     db.init_app(app)

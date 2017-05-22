@@ -18,10 +18,8 @@ headers={
   }
 
 
-
-def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset):
-    """Make GET requests to API for recipe searches."""
-
+def get_recipe_api(include_ingredients, diet, cuisines, intolerances, offset):
+    """Make GET request to API for recipe searches"""
     payload = {
             'addRecipeInformation': False, 
             'includeIngredients': include_ingredients,
@@ -34,10 +32,29 @@ def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset
         }
 
     print payload
+
     recipes = requests.get(search_recipe_complex, headers=headers, params=payload)
 
     if recipes.status_code != requests.codes.ok: #need 504 error to happen to confirm if this works
         return None
+
+    return recipes
+
+
+def get_detailed_recipe_info(recipe_ids_bulk):
+    """Feed recipe results ids into bulk_recipe_info API endpoint"""
+    bulk_recipe_results = requests.get(bulk_recipe_info, headers=headers, params={'ids': recipe_ids_bulk})
+
+    return bulk_recipe_results
+
+
+def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset):
+    """Make recipe search request, get detailed recipe info for each and display results"""
+
+    recipes = get_recipe_api(include_ingredients, diet, cuisines, intolerances, offset)
+
+    # if recipes.status_code != requests.codes.ok: #need 504 error to happen to confirm if this works
+    #     return None
 
     recipes = recipes.json()
 
@@ -45,8 +62,6 @@ def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset
     print recipe_formatted #view formatted response in terminal
 
     recipe_results_list = [] #list of recipes to pass to recipe_results.html
-
-
 
     recipe_results = recipes['results'] 
     total_results = recipes['totalResults']
@@ -59,7 +74,7 @@ def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset
         recipe_ids_bulk = ','.join(recipe_ids)
         # print recipe_ids_bulk
 
-        bulk_recipe_results = requests.get(bulk_recipe_info, headers=headers, params={'ids': recipe_ids_bulk}) 
+        bulk_recipe_results = get_detailed_recipe_info(recipe_ids_bulk)
         bulk_recipe_results = bulk_recipe_results.json()
 
         # print bulk_recipe_results
@@ -106,4 +121,14 @@ def get_recipe_info(recipe_id):
     saved_recipe = saved_recipe.json() #dict
 
     return saved_recipe
+
+
+
+
+if __name__ == "__main__":
+    print
+    import doctest
+    if doctest.testmod().failed == 0:
+        print "*** ALL TESTS PASSED ***"
+    print
 
