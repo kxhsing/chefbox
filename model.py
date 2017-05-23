@@ -1,6 +1,7 @@
 """Models and database functions for project."""
 
 from flask_sqlalchemy import SQLAlchemy
+import bcrypt
 
 # This is the connection to the PostgreSQL database; we're getting this through
 # the Flask-SQLAlchemy helper library. On this, we can find the `session`
@@ -158,14 +159,16 @@ class Review(db.Model):
 def example_data():
     """Create some sample data."""
 
-    # In case this is run more than once, empty out existing data
-    # Employee.query.delete()
-    # Department.query.delete()
-
     # Add sample users
-    karen = User(firstname='Karen', lastname='Hsing', email='karen@gmail.com', password='cookies')
-    jesse = User(firstname='Jesse', lastname='Boeuf', email='jesse@gmail.com', password='noodles')
-    cora = User(firstname='Cora', lastname='Car', email='cora@gmail.com', password='corolla')
+    password='cookies' 
+    hashed_pw = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
+    karen = User(firstname='Karen', lastname='Hsing', email='karen@gmail.com', password=hashed_pw)
+    password='noodles' 
+    hashed_pw = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
+    jesse = User(firstname='Jesse', lastname='Boeuf', email='jesse@gmail.com', password=hashed_pw)
+    password='corolla' 
+    hashed_pw = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
+    cora = User(firstname='Cora', lastname='Car', email='cora@gmail.com', password=hashed_pw)
 
 
     db.session.add_all([karen, jesse, cora])

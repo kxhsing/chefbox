@@ -48,6 +48,41 @@ def get_detailed_recipe_info(recipe_ids_bulk):
     return bulk_recipe_results
 
 
+def process_bulk_recipes(bulk_recipe_results):
+    """Take bulk recipe results and extract needed info about each recipe"""
+    recipe_results_list = []
+    for recipe in bulk_recipe_results:
+            recipe_id = recipe['id']
+            recipe_title = recipe['title']
+            recipe_source_name = recipe.get('sourceName')
+            recipe_source_url = recipe.get('sourceUrl')
+            recipe_img = recipe['image']
+
+            steps = recipe['analyzedInstructions'][0]['steps']
+            step_instructions = [] #create list for all instruction steps
+
+            for step in steps:
+                if len(step['step']) > 2:
+                    step_instructions.append(step['step'])
+
+            ingredients = recipe['extendedIngredients'] # list of dictionaries. each dict contains info about all ingredients, including 'name', 'amount', 'unit'
+
+            ingredient_names_amt = []
+            for ingredient in ingredients:
+                ingredient_name = ingredient['name'].title()
+                ingredient_amt = str(ingredient['amount'])+" "
+                ingredient_unit = ingredient['unitShort'].lower()+" - "
+                ingredient_final = ingredient_amt + ingredient_unit + ingredient_name
+                ingredient_names_amt.append(ingredient_final)
+
+
+            #master list of info with id, title, name, source, image, for each recipe
+            recipe_info = [recipe_id, recipe_title, recipe_source_name, recipe_source_url, recipe_img, step_instructions, ingredient_names_amt]
+            recipe_results_list.append(recipe_info)
+
+    return recipe_results_list
+
+
 def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset):
     """Make recipe search request, get detailed recipe info for each and display results"""
 
@@ -79,35 +114,7 @@ def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset
 
         # print bulk_recipe_results
 
-        for recipe in bulk_recipe_results:
-            recipe_id = recipe['id']
-            recipe_title = recipe['title']
-            recipe_source_name = recipe.get('sourceName')
-            recipe_source_url = recipe.get('sourceUrl')
-            recipe_img = recipe['image']
-
-            steps = recipe['analyzedInstructions'][0]['steps']
-            step_instructions = [] #create list for all instruction steps
-
-            for step in steps:
-                if len(step['step']) > 2:
-                    step_instructions.append(step['step'])
-
-            ingredients = recipe['extendedIngredients'] # list of dictionaries. each dict contains info about all ingredients, including 'name', 'amount', 'unit'
-
-            ingredient_names_amt = []
-            for ingredient in ingredients:
-                ingredient_name = ingredient['name'].title()
-                ingredient_amt = str(ingredient['amount'])+" "
-                ingredient_unit = ingredient['unitShort'].lower()+" - "
-                ingredient_final = ingredient_amt + ingredient_unit + ingredient_name
-                ingredient_names_amt.append(ingredient_final)
-
-
-            #master list of info with id, title, name, source, image, for each recipe
-            recipe_info = [recipe_id, recipe_title, recipe_source_name, recipe_source_url, recipe_img, step_instructions, ingredient_names_amt]
-            recipe_results_list.append(recipe_info)
-
+        recipe_results_list = process_bulk_recipes(bulk_recipe_results)
         request_result = (total_results, recipe_results_list)
         return request_result
     else:

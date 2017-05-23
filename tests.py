@@ -1,7 +1,8 @@
 from unittest import TestCase
-from model import connect_to_db, db, example_data
+from model import User, connect_to_db, db, example_data
 from server import app
 from flask import session
+
 
 class FlaskTestBasic(TestCase):
     """Flask tests that don't require user to be logged in"""
@@ -46,20 +47,23 @@ class FlaskTestsLogInLogOut(TestCase):
     def test_login(self):
         """Test log in form."""
 
+        user = db.session.query(User).filter(User.email=='karen@gmail.com').one()
+
         with self.client as c:
             result = c.post('/login',
-                            data={'email': 'karen@gmail.com', 'password': user.password.encode('utf8')},
+                            data={'email': 'karen@gmail.com', 'password': 'cookies'},
                             follow_redirects=True
                             )
-            self.assertEqual(session['user_id'], '1')
+            self.assertEqual(session['user_id'], user.user_id)
             self.assertIn("You are logged in", result.data)
 
     def test_logout(self):
         """Test logout route."""
+        user = db.session.query(User).filter(User.email=='karen@gmail.com').one()
 
         with self.client as c:
             with c.session_transaction() as sess:
-                sess['user_id'] = '1'
+                sess['user_id'] = user.user_id
 
             result = self.client.get('/logout', follow_redirects=True)
 

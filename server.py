@@ -88,6 +88,7 @@ def login_check():
         return redirect("/")
     else:
         user = User.query.filter(User.email==email).one()
+
         if bcrypt.checkpw(password.encode('utf8'), user.password.encode('utf8')):
             session['user_id'] = user.user_id 
             flash("You are logged in")
@@ -222,14 +223,12 @@ def search_recipe():
     cuisines = ["african", "chinese", "japanese", "korean", "vietnamese", "thai", "indian", "british", "irish", "french", "italian", "mexican", "spanish", "middle eastern", "jewish", "american", "cajun", "southern", "greek", "german", "nordic", "eastern european", "caribbean", "latin american"]
     diets = ["pescetarian", "lacto vegetarian", "ovo vegetarian", "vegan", "paleo", "primal", "vegetarian"]
     intolerances = ["dairy", "egg", "gluten", "peanut", "sesame", "seafood", "shellfish", "soy", "sulfite", "tree nut", "wheat"]
-    types = ["main course", "side dish", "dessert", "appetizer", "salad", "bread", "breakfast", "soup", "beverage", "sauce", "drink"] #not sure if going to keep this, seems to really limit search results
 
     return render_template("search_recipe.html", 
                             user=user, 
                             cuisines=cuisines, 
                             diets=diets, 
-                            intolerances=intolerances, 
-                            types=types)
+                            intolerances=intolerances)
 
 
 @app.route('/request_recipe', methods=["POST"])
@@ -426,6 +425,20 @@ def upload():
     return redirect('/board/'+str(user_id))
 
 
+@app.route('/del_photo', methods=["POST"])
+def del_photo():
+
+    user_id = session.get("user_id")
+    user = User.query.filter(User.user_id==user_id).one()
+    recipe_id = request.form.get("recipe_id") 
+    review = Review.query.filter(Review.user_id==user_id, Review.recipe_id==recipe_id).one()
+    review.photo_url = None
+
+    db.session.commit()
+
+    return redirect('/board/'+str(user_id))
+
+
 @app.route('/write_review', methods=["POST"])
 def write_review():
     user_id = session.get("user_id")
@@ -445,10 +458,11 @@ def edit_review():
     user_id = session.get("user_id")
     recipe_id = request.form.get("recipe_id")
     print recipe_id
-    edited_review = request.form.get("review")
+    edited_review = request.form.get("edit_review")
     print edited_review
 
     user_review = Review.query.filter(Review.user_id==user_id, Review.recipe_id==recipe_id).one()
+    print user_review
     user_review.review = edited_review
 
     db.session.commit()

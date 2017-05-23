@@ -30,10 +30,17 @@
                           Photo by {{ user.firstname }} {{ user.lastname }}<br>
                         {% endif %}
                         <button type="button" class="upload-button">
-                          {% if review.photo_url %}Update Photo
+                          {% if review.photo_url %}
+                            Update Photo
                           {% else %}Upload Photo
                           {% endif %}
                         </button>
+                        {% if review.photo_url %}
+                          <form action="/del_photo" method="POST">
+                            <button type="submit" class="delete-photo-btn" name="review_id" value="{{ review.review_id }}">Delete Photo</button>
+                            <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
+                          </form>
+                        {% endif %}
                         <form method="POST" enctype="multipart/form-data" action="{{ url_for('upload') }}" class="upload-form">
                           <input type="file" name="photo"><br>
                           <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
@@ -46,7 +53,7 @@
                           {% if not review.review %}
                           <button type="button" class="review-button">Review Recipe</button><br>
                           <form action="/write_review" method="POST" class="review-form" id="{{ review.review_id }}"> 
-                            <textarea form="{{ review.review_id }}" name="review"> </textarea><br>
+                            <textarea form="{{ review.review_id }}" name="review"></textarea><br>
                             <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
                             <input type="submit" value="Submit">
                           </form>
@@ -54,9 +61,11 @@
                             Review<br>
                             <div class="existing-review">{{ review.review }}<br>
                             </div>
-                              <form action="/edit_review" method="POST" class="editable-review"><textarea form="editable-review" name="review">{{ review.review }}</textarea><br>
+                              <form action="/edit_review" method="POST" class="editable-review" id="{{ review.review_id }}">
+                                <textarea form="{{ review.review_id }}" name="edit_review">{{ review.review }}</textarea><br>
                                 <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
-                                <input type="submit" class="edited-review"></form>
+                                <input type="submit" class="edited-review">
+                              </form>
 
                             <button type="button" class="edit-review-btn">Edit Review</button>
                           {% endif %}
@@ -140,7 +149,7 @@
         //Make existing recipe review editable
         $(".edit-review-btn").on("click", function(){
           var thisButton = this;
-          var thisForm = thisButton.previousElementSibling; //form
+          var thisForm = thisButton.previousElementSibling; 
           var thisDiv = thisForm.previousElementSibling;
 
           $(thisForm).toggle();
