@@ -404,7 +404,9 @@ configure_uploads(app, photos)
 @app.route('/upload', methods=["GET", "POST"])
 def upload():
     user_id = session.get("user_id")
+    # import pdb; pdb.set_trace()
     photo = request.files["photo"]
+
     recipe_id = request.form.get("recipe_id")
     # print recipe_id
 
@@ -421,7 +423,7 @@ def upload():
     review.photo_url = filename
     db.session.commit()
 
-
+    # return jsonify({'photo': review.photo_url})
     return redirect('/board/'+str(user_id))
 
 
@@ -429,14 +431,18 @@ def upload():
 def del_photo():
 
     user_id = session.get("user_id")
+    print user_id
     user = User.query.filter(User.user_id==user_id).one()
     recipe_id = request.form.get("recipe_id") 
+    print recipe_id
     review = Review.query.filter(Review.user_id==user_id, Review.recipe_id==recipe_id).one()
+
     review.photo_url = None
 
     db.session.commit()
 
-    return redirect('/board/'+str(user_id))
+    # return redirect('/board/'+str(user_id))
+    return jsonify({})
 
 
 @app.route('/write_review', methods=["POST"])

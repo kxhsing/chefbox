@@ -26,24 +26,27 @@
                     <tr>
                       <td>
                         {% if review.photo_url %}
+                        <div class="photo-with-credit">
                           <img src="/static/photos/{{ review.photo_url }}"><br>
                           Photo by {{ user.firstname }} {{ user.lastname }}<br>
+                        </div>
                         {% endif %}
                         <button type="button" class="upload-button">
                           {% if review.photo_url %}
                             Update Photo
-                          {% else %}Upload Photo
+                          {% else %}
+                            Upload Photo
                           {% endif %}
                         </button>
                         {% if review.photo_url %}
-                          <form action="/del_photo" method="POST">
-                            <button type="submit" class="delete-photo-btn" name="review_id" value="{{ review.review_id }}">Delete Photo</button>
+                          <form action="/del_photo" method="POST" class="del-photo">
+                            <button type="submit" class="delete-photo-btn" name="review_id" value="{{ review.recipe_id }}">Delete Photo</button>
                             <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
                           </form>
                         {% endif %}
                         <form method="POST" enctype="multipart/form-data" action="{{ url_for('upload') }}" class="upload-form">
                           <input type="file" name="photo"><br>
-                          <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
+                          <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}" class="photo-recipe-id">
                           <input type="submit">
                         </form>
                       </td>
@@ -108,133 +111,8 @@
 
   <p><a href="/recipes/{{ user.user_id }}">Recipe Box</a></p>
 
-  <script>
 
-        //Remove recipe from UserRecipe
-        function deleteRecipe(evt) {
-          evt.preventDefault();
-
-          var thisButton = this;
-          var thisTable = $(thisButton).parentsUntil("table");
-
-
-          var formInputs = {
-            "recipe_id": this.value
-          };
-
-
-          $.post("/del_recipe", formInputs, function(){
-
-            alert("Recipe removed.");
-            $(thisTable).fadeOut();
-
-
-          });
-        }
-
-        $(".del-recipe").on('click', deleteRecipe);
-
-        //Display upload photo form on click 
-        $(".upload-button").on("click", function(){
-          var thisButton = this;
-          var thisForm = thisButton.nextElementSibling;
-          $(thisForm).toggle();
-          });
-
-
-
-        function displayEditForm(){
-          var thisButton = this;
-          var thisForm = $(thisButton).siblings("form"); 
-          var thisDiv = $(thisButton).siblings("div.review");
-          $(thisForm).toggle();
-          $(thisDiv).toggle();
-          if (thisButton.innerText=="Edit Review" || thisButton.innerText=="Review Recipe") {
-            thisButton.innerText = "Cancel";
-          }
-          else {
-            thisButton.innerText = "Edit Review";
-          }
-        }
-        $(".edit-review-btn").on("click", displayEditForm);
-        
-
-
-
-        //AJAX post request to write new review
-        function writeReview(evt) {
-          evt.preventDefault();
-          // debugger;
-          var thisForm = this;
-          var thisDiv = $(this).siblings("div.review");
-          var reviewTextarea = this.firstElementChild;
-          var recipeID = $(reviewTextarea).next().next().val();
-          var review = reviewTextarea.value;
-
-          var formInputs = {
-            "recipe_id": recipeID,
-            "review": review
-          };
-
-          var button = $(thisForm).siblings("button.edit-review-btn");
-          if (review==""){
-            button.text("Review Recipe");
-          }
-          else {
-            button.text("Edit Review");
-          }
-
-          $.post("/write_review", formInputs, function (result) {
-            console.log(result);
-            $(thisForm).hide();
-            alert("Recipe reviewed!");
-            var newReview = result.review;
-            // var reviewCell = $(thisForm).parent();
-
-            thisDiv.text(newReview);
-            thisDiv.show();
-    
-          });
-        }
-
-        $(".review-form").on("submit", writeReview);
-
-
-
-
-
-
-
-
-
-
-
-
-        //AJAX post request to submit edited review
-        // function updateReview(evt) {
-        // evt.preventDefault();
-
-        // var thisButton = this;
-        // debugger
-        // var thisTable = $(thisButton).parentsUntil("table");
-
-
-        // var formInputs = {
-        //   "recipe_id": this.value
-        // };
-
-
-        // $.post("/edit_review", formInputs, function(){
-
-
-        // });
-        // }
-
-        // $(".edited-review").on('click', updateReview);
-
-
-
-  </script>
+ <script src="/static/user_board.js"></script>
 
 
 
