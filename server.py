@@ -449,26 +449,7 @@ def write_review():
     this_review.review = submitted_review
     db.session.commit()
 
-
-    return redirect('/board/'+str(user_id))
-
-
-@app.route('/edit_review', methods=["POST"])
-def edit_review():
-    user_id = session.get("user_id")
-    recipe_id = request.form.get("recipe_id")
-    print recipe_id
-    edited_review = request.form.get("edit_review")
-    print edited_review
-
-    user_review = Review.query.filter(Review.user_id==user_id, Review.recipe_id==recipe_id).one()
-    print user_review
-    user_review.review = edited_review
-
-    db.session.commit()
-
-    return redirect('/board/'+str(user_id))
-    # return jsonify({'recipe_id': recipe_id, 'review':review})
+    return jsonify({'review': submitted_review})
 
 
 

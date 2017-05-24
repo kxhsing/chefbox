@@ -10,7 +10,7 @@
     </p>
     <ul>
     {% for review in user.reviews %}
-      <table>
+      <table id="user-review-table">
                     <tr>
                       <th>{{ review.recipe.title }}</th>
                     </tr>
@@ -51,24 +51,26 @@
                       <tr> 
                         <td>
                           {% if not review.review %}
-                          <button type="button" class="review-button">Review Recipe</button><br>
+                          <div class="review">
+                          </div>
                           <form action="/write_review" method="POST" class="review-form" id="{{ review.review_id }}"> 
                             <textarea form="{{ review.review_id }}" name="review"></textarea><br>
                             <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
                             <input type="submit" value="Submit">
                           </form>
+                          <button type="button" class="edit-review-btn">Review Recipe</button><br>
                           {% else %}
                             Review<br>
-                            <div class="existing-review">{{ review.review }}<br>
+                            <div class="review">{{ review.review }}<br>
                             </div>
-                              <form action="/edit_review" method="POST" class="editable-review" id="{{ review.review_id }}">
-                                <textarea form="{{ review.review_id }}" name="edit_review">{{ review.review }}</textarea><br>
+                              <form action="/write_review" method="POST" class="review-form" id="{{ review.review_id }}">
+                                <textarea form="{{ review.review_id }}" name="review">{{ review.review }}</textarea><br>
                                 <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
                                 <input type="submit" class="edited-review">
                               </form>
-
                             <button type="button" class="edit-review-btn">Edit Review</button>
                           {% endif %}
+
                         </td>
                       </tr>
 
@@ -139,30 +141,72 @@
           $(thisForm).toggle();
           });
 
-        //Display review form on click 
-        $(".review-button").on("click", function(){
-          var thisButton = this;
-          var thisForm = thisButton.nextElementSibling.nextElementSibling;
-          $(thisForm).toggle();
-          });
 
-        //Make existing recipe review editable
-        $(".edit-review-btn").on("click", function(){
-          var thisButton = this;
-          var thisForm = thisButton.previousElementSibling; 
-          var thisDiv = thisForm.previousElementSibling;
 
+        function displayEditForm(){
+          var thisButton = this;
+          var thisForm = $(thisButton).siblings("form"); 
+          var thisDiv = $(thisButton).siblings("div.review");
           $(thisForm).toggle();
           $(thisDiv).toggle();
-          if (thisButton.innerText=="Edit Review") {
+          if (thisButton.innerText=="Edit Review" || thisButton.innerText=="Review Recipe") {
             thisButton.innerText = "Cancel";
           }
           else {
             thisButton.innerText = "Edit Review";
           }
+        }
+        $(".edit-review-btn").on("click", displayEditForm);
+        
 
 
+
+        //AJAX post request to write new review
+        function writeReview(evt) {
+          evt.preventDefault();
+          // debugger;
+          var thisForm = this;
+          var thisDiv = $(this).siblings("div.review");
+          var reviewTextarea = this.firstElementChild;
+          var recipeID = $(reviewTextarea).next().next().val();
+          var review = reviewTextarea.value;
+
+          var formInputs = {
+            "recipe_id": recipeID,
+            "review": review
+          };
+
+          var button = $(thisForm).siblings("button.edit-review-btn");
+          if (review==""){
+            button.text("Review Recipe");
+          }
+          else {
+            button.text("Edit Review");
+          }
+
+          $.post("/write_review", formInputs, function (result) {
+            console.log(result);
+            $(thisForm).hide();
+            alert("Recipe reviewed!");
+            var newReview = result.review;
+            // var reviewCell = $(thisForm).parent();
+
+            thisDiv.text(newReview);
+            thisDiv.show();
+    
           });
+        }
+
+        $(".review-form").on("submit", writeReview);
+
+
+
+
+
+
+
+
+
 
 
 

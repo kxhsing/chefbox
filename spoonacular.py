@@ -30,11 +30,9 @@ def get_recipe_api(include_ingredients, diet, cuisines, intolerances, offset):
             'ranking': 1,
             'offset': offset
         }
-
-    print payload
+    # print payload
 
     recipes = requests.get(search_recipe_complex, headers=headers, params=payload)
-
     if recipes.status_code != requests.codes.ok: #need 504 error to happen to confirm if this works
         return None
 
@@ -102,17 +100,10 @@ def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset
     total_results = recipes['totalResults']
 
     if recipe_results: #checking if any results returned. 
-        # print recipe_results
-
         recipe_ids = [str(recipe['id']) for recipe in recipe_results] #fetch each recipe id, add to id list and run in "Get Bulk Recipe Info" endpoint
-
         recipe_ids_bulk = ','.join(recipe_ids)
-        # print recipe_ids_bulk
-
         bulk_recipe_results = get_detailed_recipe_info(recipe_ids_bulk)
         bulk_recipe_results = bulk_recipe_results.json()
-
-        # print bulk_recipe_results
 
         recipe_results_list = process_bulk_recipes(bulk_recipe_results)
         request_result = (total_results, recipe_results_list)
