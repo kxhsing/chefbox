@@ -1,51 +1,66 @@
 
 
        //Remove recipe from user's recipe box
-       function deleteRecipe(evt) {
-          evt.preventDefault();
+      function deleteRecipe(evt) {
+        evt.preventDefault();
 
-          var thisButton = this;
-          var thisTable = $(thisButton).parentsUntil("table");
-
-
-          var formInputs = {
-            "recipe_id": this.value
-          };
+        var thisButton = this;
+        var thisTable = $(thisButton).parentsUntil("table");
 
 
-          $.post("/del_recipe", formInputs, function(){
+        var formInputs = {
+          "recipe_id": this.value
+        };
 
-            alert("Recipe removed.");
-            $(thisTable).fadeOut();
+
+        $.post("/del_recipe", formInputs, function(){
+
+          alert("Recipe removed.");
+          $(thisTable).fadeOut();
 
 
-          });
-        }
+        });
+      }
 
         $(".del-recipe").on('click', deleteRecipe);
 
 
-        //Mark recipe as cooked and move to Chef Board
-       function reviewRecipe(evt) {
-          evt.preventDefault();
+      //Display instructions on click 
+      $(".instructions-button").on("click", function(){
+        var thisButton = this;
+        var instructions = $(thisButton).siblings("ol.recipe-instructions");
+        $(instructions).toggle();
 
-          var thisButton = this;
-          var thisTable = $(thisButton).parentsUntil("table");
-
-
-          var formInputs = {
-            "recipe_id": this.value
-          };
-
-
-          $.post("/review_recipe", formInputs, function(){
-
-            alert("Recipe moved to your Chef Board. Upload a photo & review the recipe there.");
-            $(thisTable).fadeOut();
-
-
-          });
+        if ($(thisButton).text()=="View Instructions") {
+        $(thisButton).text("Hide Instructions");
         }
+        else {
+          $(thisButton).text("View Instructions");
+        }
+
+        });
+
+        //Mark recipe as cooked and move to Chef Board
+      function reviewRecipe(evt) {
+        evt.preventDefault();
+
+        var thisButton = this;
+        var thisTable = $(thisButton).parentsUntil("table");
+
+
+        var formInputs = {
+          "recipe_id": this.value
+        };
+
+
+        $.post("/review_recipe", formInputs, function(){
+
+          alert("Recipe moved to your Chef Board. Upload a photo & review the recipe there.");
+          $(thisTable).fadeOut();
+
+
+        });
+      }
 
         $(".review-recipe").on('click', reviewRecipe);
 
