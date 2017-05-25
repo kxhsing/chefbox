@@ -25,12 +25,12 @@
                     </tr>
                     <tr>
                       <td>
-                        {% if review.photo_url %}
                         <div class="photo-with-credit">
+                        {% if review.photo_url %}
                           <img src="/static/photos/{{ review.photo_url }}"><br>
                           Photo by {{ user.firstname }} {{ user.lastname }}<br>
-                        </div>
                         {% endif %}
+                        </div>
                         <button type="button" class="upload-button">
                           {% if review.photo_url %}
                             Update Photo
@@ -38,17 +38,17 @@
                             Upload Photo
                           {% endif %}
                         </button>
+                        <form method="POST" enctype="multipart/form-data" action="{{ url_for('upload') }}" class="upload-form">
+                          <input type="file" name="photo"><br>
+                          <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}" class="photo-recipe-id">
+                          <input type="submit">
+                        </form>
                         {% if review.photo_url %}
                           <form action="/del_photo" method="POST" class="del-photo">
                             <button type="submit" class="delete-photo-btn" name="review_id" value="{{ review.recipe_id }}">Delete Photo</button>
                             <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
                           </form>
                         {% endif %}
-                        <form method="POST" enctype="multipart/form-data" action="{{ url_for('upload') }}" class="upload-form">
-                          <input type="file" name="photo"><br>
-                          <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}" class="photo-recipe-id">
-                          <input type="submit">
-                        </form>
                       </td>
                       </tr>
                       <tr> 

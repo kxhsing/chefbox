@@ -404,11 +404,11 @@ configure_uploads(app, photos)
 @app.route('/upload', methods=["GET", "POST"])
 def upload():
     user_id = session.get("user_id")
-    # import pdb; pdb.set_trace()
     photo = request.files["photo"]
-
     recipe_id = request.form.get("recipe_id")
-    # print recipe_id
+    user = User.query.filter(User.user_id==user_id).one()
+    firstname = user.firstname
+    lastname = user.lastname
 
     try:    
         if request.method == "POST" and "photo" in request.files:
@@ -421,10 +421,11 @@ def upload():
     #Add photo url to Review object
     review = Review.query.filter(Review.user_id==user_id, Review.recipe_id==recipe_id).one()
     review.photo_url = filename
+    print review.photo_url
     db.session.commit()
 
-    # return jsonify({'photo': review.photo_url})
-    return redirect('/board/'+str(user_id))
+    return jsonify({'photo': review.photo_url, 'firstname': firstname, 'lastname': lastname})
+    # return redirect('/board/'+str(user_id))
 
 
 @app.route('/del_photo', methods=["POST"])

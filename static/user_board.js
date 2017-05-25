@@ -26,92 +26,57 @@ $(".upload-button").on("click", function(){
   var thisButton = this;
   var uploadForm = $(thisButton).siblings("form.upload-form");
   $(uploadForm).toggle();
+  // if ($(thisButton).text()=="Upload Photo" || $(thisButton).text()=="Update Photo") {
+  // $(thisButton).text("Cancel");
+  // }
+  // else {
+  //   $(thisButton).text("Upload Photo");
+  // }   
+
   });
 
 
 //AJAX post request to upload/update photo
-// function uploadPhoto(evt) {
-//   evt.preventDefault();
+function uploadPhoto(evt) {
+  evt.preventDefault();
 
-//   var thisForm = this;
-//   var thisAction = this.action;
-//   var thisPhotoInput = this.firstElementChild;
-//   var photoFile = thisPhotoInput.value;
-//   var recipeID = thisPhotoInput.nextElementSibling.nextElementSibling.value;
-//   var uploadButton = this.previousElementSibling;
-//   // debugger;
-
-//   var formInputs = {
-//     "recipe_id": recipeID,
-//     "photo": photoFile
-//   };
+  var thisForm = this;
+  var thisAction = this.action;
+  var thisPhotoInput = this.firstElementChild;
+  var recipeID = thisPhotoInput.nextElementSibling.nextElementSibling.value;
+  var uploadButton = $(this).siblings("button.upload-button");
 
 
-//   $.post(thisAction, formInputs, function (result) {
-//     console.log(result);
-//     alert("Photo uploaded!");
-//     var newReview = result.review;
-//     uploadButton.text("Update Photo");
-//     // thisDiv.text(newReview);
-//     // thisDiv.show();
-
-//   });
-// }
-
-// $(".upload-form").on("submit", uploadPhoto);
-
-
-
-// function uploadPhoto(evt) {
-//   evt.preventDefault();
-
-//   var thisForm = this;
-//   var thisAction = this.action;
-//   var thisPhotoInput = this.firstElementChild;
-//   var photoFile = thisPhotoInput.value;
-//   var recipeID = thisPhotoInput.nextElementSibling.nextElementSibling.value;
-//   var uploadButton = this.previousElementSibling;
-//   debugger;
-
-  // var formInputs = {
-  //   "recipe_id": recipeID,
-  //   "photo": photoFile
-  // };
+  var form_data = new FormData(thisForm);
+  $.ajax({
+      type: 'POST',
+      url: this.action,
+      data: form_data,
+      contentType: false,
+      cache: false,
+      processData: false,
+      async: false,
+      success: function(data) {
+          alert("Photo uploaded!");
+          $(uploadButton).text("Update Photo");
+          // debugger;
+          // if ($(uploadButton).text()=="Upload Photo" || $(uploadButton).text()=="Update Photo") {
+          //   $(uploadButton).text("Cancel");
+          // }
+          // else {
+          //   $(uploadButton).text("Update Photo");
+          // }          
+          console.log(data);
+          var newPhoto = $(thisForm).siblings("div.photo-with-credit");
+          newPhoto.html('<img src="/static/photos/'+data.photo+'"><br>Photo by '+data.firstname+' '+data.lastname)
 
 
-  // var form_data = new FormData(thisPhotoInput);
-  // $.ajax({
-  //     type: 'POST',
-  //     url: this.action,
-  //     data: form_data,
-  //     contentType: false,
-  //     cache: false,
-  //     processData: false,
-  //     async: false,
-  //     success: function(data) {
-  //         alert("Photo uploaded!");
-  //         uploadButton.text("Update Photo");
+      },
+  });
 
-  //     },
-  // });
+}
 
-  // $.post(thisAction, formInputs, function (result) {
-  //   console.log(result);
-  //   alert("Photo uploaded!");
-  //   uploadButton.text("Update Photo");
-
-    
-    
-    // thisDiv.text(newReview);
-    // thisDiv.show();
-
-//   });
-// }
-
-// $(".upload-form").on("submit", uploadPhoto);
-
-
-
+$(".upload-form").on("submit", uploadPhoto);
 
 
 
@@ -131,7 +96,7 @@ function deletePhoto(evt) {
   $.post("/del_photo", formInputs, function(){
 
     alert("Photo deleted.");
-    thisDiv.remove();
+    thisDiv.empty();
     thisButton.remove();
     uploadButton.text("Upload Photo");
 
@@ -139,7 +104,6 @@ function deletePhoto(evt) {
 }
 
 $(".delete-photo-btn").on('click', deletePhoto);
-
 
 
 
@@ -187,9 +151,9 @@ function writeReview(evt) {
     console.log(result);
     $(thisForm).hide();
     alert("Recipe reviewed!");
-    var newPhoto = result.photo;
-    // thisDiv.text(newReview);
-    // thisDiv.show();
+    var newReview = result.review;
+    thisDiv.text(newReview);
+    thisDiv.show();
 
   });
 }
