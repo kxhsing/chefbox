@@ -68,7 +68,7 @@ def process_bulk_recipes(bulk_recipe_results):
             ingredient_names_amt = []
             for ingredient in ingredients:
                 ingredient_name = ingredient['name'].title()
-                ingredient_amt = str(ingredient['amount'])+" "
+                ingredient_amt = str(round(ingredient['amount'],2))+" "
                 ingredient_unit = ingredient['unitShort'].lower()+" - "
                 ingredient_final = ingredient_amt + ingredient_unit + ingredient_name
                 ingredient_names_amt.append(ingredient_final)

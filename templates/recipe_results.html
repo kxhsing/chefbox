@@ -36,8 +36,9 @@
                       </td>
                     </tr>
                       <tr>
-                        <td>Instructions<br>
-                          <ol>
+                        <td>
+                          <button type="button" class="instructions-button">View Instructions</button>
+                          <ol class="recipe-instructions">
                           {% for instruction in recipe[5] %}
                               <li>{{ instruction }}</li>
                           {% endfor %}
@@ -92,8 +93,22 @@
           });
         }
 
-        $(".add-recipe").on('click', addRecipe);
+      $(".add-recipe").on('click', addRecipe);
 
+      //Display instructions on click 
+      $(".instructions-button").on("click", function(){
+        var thisButton = this;
+        var instructions = $(thisButton).siblings("ol.recipe-instructions");
+        $(instructions).toggle();
+
+        if ($(thisButton).text()=="View Instructions") {
+        $(thisButton).text("Hide Instructions");
+        }
+        else {
+          $(thisButton).text("View Instructions");
+        }
+
+        });
 
 
   </script>

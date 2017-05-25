@@ -58,15 +58,7 @@ function uploadPhoto(evt) {
       async: false,
       success: function(data) {
           alert("Photo uploaded!");
-          $(uploadButton).text("Update Photo");
-          // debugger;
-          // if ($(uploadButton).text()=="Upload Photo" || $(uploadButton).text()=="Update Photo") {
-          //   $(uploadButton).text("Cancel");
-          // }
-          // else {
-          //   $(uploadButton).text("Update Photo");
-          // }          
-          console.log(data);
+          $(uploadButton).text("Update Photo");        
           var newPhoto = $(thisForm).siblings("div.photo-with-credit");
           newPhoto.html('<img src="/static/photos/'+data.photo+'"><br>Photo by '+data.firstname+' '+data.lastname)
 

@@ -336,7 +336,7 @@ def add_recipe():
         #Create Ingredient instances for ingredients that do not already exist in db
         for ingredient in ingredients:
             ingredient_name = ingredient['name']
-            ingredient_amt = ingredient['amount']
+            ingredient_amt = round(ingredient['amount'],2)
             ingredient_unit = ingredient['unitShort']
             if not Ingredient.query.filter(Ingredient.ingred_name==ingredient_name).all(): #if ingredient not in db. add to it
                 new_ingred = Ingredient(ingred_name=ingredient_name)
