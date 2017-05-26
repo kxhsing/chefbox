@@ -4,14 +4,13 @@ from server import app
 from flask import session
 
 
-class FlaskTestBasic(TestCase):
+class TestIndex(TestCase):
     """Flask tests that don't require user to be logged in"""
 
     def setUp(self):
         """Stuff to do before every test"""
 
         self.client = app.test_client()
-
         app.config['TESTING'] = True
 
     def test_index(self):
@@ -21,7 +20,7 @@ class FlaskTestBasic(TestCase):
 
 
 
-class FlaskTestsLogInLogOut(TestCase):
+class TestsLogInLogOut(TestCase):
     """Test log in and log out."""
 
     def setUp(self):
@@ -55,7 +54,7 @@ class FlaskTestsLogInLogOut(TestCase):
                             follow_redirects=True
                             )
             self.assertEqual(session['user_id'], user.user_id)
-            self.assertIn("You are logged in", result.data)
+            self.assertIn("Hello", result.data)
 
     def test_logout(self):
         """Test logout route."""
@@ -69,6 +68,44 @@ class FlaskTestsLogInLogOut(TestCase):
 
             self.assertNotIn('user_id', session)
             self.assertIn('You are logged out.', result.data)
+
+
+class TestUserIngredRecipeBoard(TestCase):
+    """Test user Ingredient Inventory, Recipe Box, Chef Board."""
+
+    def setUp(self):
+        """Stuff to do before every test."""
+
+        self.client = app.test_client()
+        app.config['TESTING'] = True
+        connect_to_db(app, "postgresql:///testdb")
+        db.create_all()
+        example_data()
+
+    def tearDown(self):
+        """Do at end of every test."""
+
+        db.session.close()
+        db.drop_all()
+
+    def test_dashboard(self):
+        """Test user's ingredient inventory"""
+        user = db.session.query(User).filter(User.email=='karen@gmail.com').one()
+        user_id = user.user_id
+        firstname = user.firstname
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['user_id'] = user.user_id
+
+            result = c.get('/users/<user_id>',
+                            data={'user_id': user_id},
+                            follow_redirects=True
+                            )
+            # self.assertEqual(session['user_id'], user.user_id)
+            self.assertIn("Hello", result.data)
+            self.assertIn(firstname, result.data)
+
 
 
 

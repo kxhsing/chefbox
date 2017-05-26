@@ -21,6 +21,21 @@ function deleteRecipe(evt) {
 $(".del-recipe").on('click', deleteRecipe);
 
 
+//Display instructions on click 
+$(".instructions-button").on("click", function(){
+  var thisButton = this;
+  var instructions = $(thisButton).siblings("ol.recipe-instructions");
+  $(instructions).toggle();
+
+  if ($(thisButton).text()=="View Instructions") {
+  $(thisButton).text("Hide Instructions");
+  }
+  else {
+    $(thisButton).text("View Instructions");
+  }
+
+  });
+
 //Display upload photo form on click 
 $(".upload-button").on("click", function(){
   var thisButton = this;
@@ -57,13 +72,17 @@ function uploadPhoto(evt) {
       processData: false,
       async: false,
       success: function(data) {
+        if (data) {
           alert("Photo uploaded!");
           $(uploadButton).text("Update Photo");        
           var newPhoto = $(thisForm).siblings("div.photo-with-credit");
-          newPhoto.html('<img src="/static/photos/'+data.photo+'"><br>Photo by '+data.firstname+' '+data.lastname)
+          newPhoto.html('<img src="/static/photos/'+data.photo+'"><br>Photo by '+data.firstname+' '+data.lastname);
+        }
+        else {
+          alert("Not a valid photo file. Please try again."); //why is this not working?
+        }
 
-
-      },
+      }
   });
 
 }

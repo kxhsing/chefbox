@@ -12,7 +12,7 @@
     {% for review in user.reviews %}
       <table id="user-review-table">
                     <tr>
-                      <th>{{ review.recipe.title }}</th>
+                      <th>{{ review.recipe.title.title() }}</th>
                     </tr>
                     <tr>
                       <td>Recipe via {% if review.recipe.url and review.recipe.source_name %}<a href="{{ review.recipe.url }}" target="_blank"> {{ review.recipe.source_name }} </a> 
@@ -87,9 +87,10 @@
                         </td>
                       </tr>
                         <tr>
-                          <td>Instructions<br>
+                          <td>
                             {% set instruction_list = review.recipe.instructions[2:-2].split("\",\"") %}
-                            <ol>
+                            <button type="button" class="instructions-button">View Instructions</button>
+                            <ol class="recipe-instructions">
                             {% for instruction in instruction_list %}
                               <li>{{ instruction }}</li>
                             {% endfor %}

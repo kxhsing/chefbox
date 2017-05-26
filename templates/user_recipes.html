@@ -14,7 +14,7 @@
           {% for recipe in recipes_list %}
             <table>
                           <tr>
-                            <th>{{ recipe.title }}</th>
+                            <th>{{ recipe.title.title() }}</th>
                           </tr>
                           <tr>
                             <td> via {% if recipe.url and recipe.source_name %}<a href="{{ recipe.url }}" target="_blank"> {{ recipe.source_name }} </a> 

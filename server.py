@@ -1,27 +1,18 @@
 
 
 from jinja2 import StrictUndefined
-
 from flask import (Flask, render_template, redirect, request, flash,
                     session, jsonify, url_for)
 
 from flask_uploads import UploadSet, IMAGES, configure_uploads
-
 from flask_debugtoolbar import DebugToolbarExtension
-
 import requests
-
 import os
-
 import json
-
 import bcrypt
-
 from model import User, Recipe, Ingredient, RecipeIngredient, UserIngredient, UserRecipe, Review, connect_to_db, db
-
 from spoonacular import get_recipe_request, get_recipe_info
-
-from actions import delete_ingredient, add_ingredient
+from actions import delete_ingredient, add_ingredient, delete_recipe, add_to_board, upload_photo, delete_photo, create_review, add_new_recipe
 
 
 app = Flask(__name__)
@@ -93,6 +84,7 @@ def login_check():
 
         if bcrypt.checkpw(password.encode('utf8'), user.password.encode('utf8')):
             session['user_id'] = user.user_id 
+            print session['user_id']
             flash("You are logged in")
             return redirect("/users/"+str(user.user_id))
         else:
@@ -115,8 +107,13 @@ def logout():
 def show_user_info(user_id):
     """Show user's dashboard, which houses linkes to saved recipes and ingredients"""
 
-    user_id = session.get("user_id")
-    user = User.query.filter(User.user_id==user_id).one()
+    user_id_session = str(session.get("user_id"))
+
+    if user_id != user_id_session:
+        flash("You are not authorized to view this profile")
+        return redirect("/")
+
+    user = User.query.filter(User.user_id==user_id_session).one()
 
     return render_template("dashboard.html", user=user)
 
@@ -125,8 +122,13 @@ def show_user_info(user_id):
 def show_user_recipes(user_id):
     """Show user's saved recipes"""
 
-    user_id = session.get("user_id")
-    user = User.query.filter(User.user_id==user_id).one()
+    user_id_session = str(session.get("user_id"))
+
+    if user_id != user_id_session:
+        flash("You are not authorized to view this profile")
+        return redirect("/")
+
+    user = User.query.filter(User.user_id==user_id_session).one()
 
     #Creating list of recipes that have not been cooked before to display in Recipe Box for user
     recipes_to_cook = UserRecipe.query.filter(UserRecipe.user_id==user_id, UserRecipe.cooked==False).all() 
@@ -143,8 +145,13 @@ def show_user_recipes(user_id):
 def show_user_ingredients(user_id):
     """Show user's ingredients"""
     
-    user_id = session.get("user_id")
-    user = User.query.filter(User.user_id==user_id).one()
+    user_id_session = str(session.get("user_id"))
+
+    if user_id != user_id_session:
+        flash("You are not authorized to view this profile")
+        return redirect("/")
+
+    user = User.query.filter(User.user_id==user_id_session).one()
 
     return render_template("user_ingred.html", user=user)
 
@@ -153,8 +160,13 @@ def show_user_ingredients(user_id):
 def show_user_board(user_id):
     """Show user's board of completed recipes"""
     
-    user_id = session.get("user_id")
-    user = User.query.filter(User.user_id==user_id).one()
+    user_id_session = str(session.get("user_id"))
+
+    if user_id != user_id_session:
+        flash("You are not authorized to view this profile")
+        return redirect("/")
+
+    user = User.query.filter(User.user_id==user_id_session).one()
 
     return render_template("user_board.html", user=user)
 
@@ -165,45 +177,14 @@ def add_ingred():
     in the database"""
 
     user_id = session.get("user_id")
-    # user = User.query.filter(User.user_id==user_id).one()
     ingredient = request.form.get("ingredient").lower()
-
-    # #Check if ingredient is in master list and then if it is in user's inventory
-    # if Ingredient.query.filter(Ingredient.ingred_name==ingredient).all():
-    #     ingredient_id = Ingredient.query.filter(Ingredient.ingred_name==ingredient).one().ingred_id
-    #     if UserIngredient.query.filter(UserIngredient.user_id==user_id, UserIngredient.ingred_id==ingredient_id).all():
-    #         # flash(ingredient.title()+" already exists in your inventory.")
-    #         return jsonify({})  
-    #     else:
-    #         new_user_ingred = UserIngredient(ingred_id=ingredient_id, user_id=user.user_id) 
-    #         db.session.add(new_user_ingred)
-    #         db.session.commit()
-    #         ingred_id = str(new_user_ingred.ingred_id)
-    #         print ingred_id
-    #         # flash ("Added to inventory: "+ingredient.title())
-    #         return jsonify({'ingredient': ingredient, 'ingred_id':ingred_id})
-
-
-    # #If ingredient not in master ingredient list, add to master ingredients
-    # #and also add to user's ingredient inventory
-    # else:
-    #     new_ingred = Ingredient(ingred_name=ingredient)
-    #     db.session.add(new_ingred)
-    #     db.session.flush()
-    #     new_user_ingred = UserIngredient(ingred_id=new_ingred.ingred_id, user_id=user.user_id)
-    #     db.session.add(new_user_ingred)
-    #     db.session.commit()
-    #     ingred_id = str(new_ingred.ingred_id)
-    #     print ingred_id
-    #     # flash ("Added to inventory: "+ingredient.title()) 
-    #     return jsonify({'ingredient': ingredient, 'ingred_id':ingred_id})
-
     result = add_ingredient(user_id, ingredient)
+
     return result
 
 
 @app.route('/del_ingred', methods=['POST'])
-def delete_ingred():
+def del_ingred():
     """Delete ingredient from user's ingredient inventory"""
 
     user_id = session.get("user_id")
@@ -297,106 +278,33 @@ def search_more():
 
 @app.route('/add_recipe', methods=["POST"])
 def add_recipe():
+    """Add recipe to user's recipe box"""
+
     user_id = session.get("user_id")
-    user = User.query.filter(User.user_id==user_id).one()
+    recipe_id = request.form.get("recipe_id")
+    result = add_new_recipe(user_id, recipe_id)
 
-    recipe_id = request.form.get('recipe_id')
-    print recipe_id
-
-    saved_recipe = get_recipe_info(recipe_id)
-
-    # print saved_recipe
-
-    saved_recipe_title = saved_recipe['title'].encode('utf-8')
-    saved_recipe_source_name = saved_recipe.get('sourceName')
-    saved_recipe_source_url = saved_recipe.get('sourceUrl')
-    #get recipe image??
-
-    steps = saved_recipe['analyzedInstructions'][0]['steps']
-    step_instructions = [] #create list for all instruction steps
-
-    for step in steps:
-        if len(step['step']) > 1:
-            step_instructions.append(step['step'])
-
-    # print step_instructions
-
-    if not Recipe.query.filter(Recipe.url==saved_recipe_source_url).all():
-        #Create new recipe for database if does not exist already
-        new_recipe = Recipe(title=saved_recipe_title, 
-                            source_name=saved_recipe_source_name, 
-                            url=saved_recipe_source_url, 
-                            instructions=step_instructions)
-
-        db.session.add(new_recipe)
-        db.session.flush()
-
-        new_recipe_id = new_recipe.recipe_id
-
-        ingredients = saved_recipe['extendedIngredients'] # list of dictionaries. each dict contains info about all ingredients, including 'name', 'amount', 'unit'
-        #Create Ingredient instances for ingredients that do not already exist in db
-        for ingredient in ingredients:
-            ingredient_name = ingredient['name']
-            ingredient_amt = round(ingredient['amount'],2)
-            ingredient_unit = ingredient['unitShort']
-            if not Ingredient.query.filter(Ingredient.ingred_name==ingredient_name).all(): #if ingredient not in db. add to it
-                new_ingred = Ingredient(ingred_name=ingredient_name)
-                db.session.add(new_ingred)
-                db.session.flush()
-
-            ingred_id = Ingredient.query.filter(Ingredient.ingred_name==ingredient_name).one().ingred_id
-
-            #Create RecipeIngredient instances 
-            ingred_info = str(ingredient_amt)+ " " + ingredient_unit.lower() + " - " + ingredient_name.title()
-
-            new_recipe_ingred = RecipeIngredient(recipe_id=new_recipe_id, 
-                                                ingred_id=ingred_id, 
-                                                ingred_info=ingred_info)
-            db.session.add(new_recipe_ingred)
-            db.session.flush()
-
-
-    existing_recipe_id = Recipe.query.filter(Recipe.url==saved_recipe_source_url).one().recipe_id
-
-    if not UserRecipe.query.filter(UserRecipe.user_id==user_id, UserRecipe.recipe_id==existing_recipe_id).all():
-        new_user_recipe = UserRecipe(recipe_id=existing_recipe_id, user_id=user_id, cooked=False)
-        db.session.add(new_user_recipe)
-        db.session.flush()
-
-    db.session.commit()
-
-    return jsonify({})
+    return result
 
 
 @app.route('/del_recipe', methods=['POST'])
-def delete_recipe():
+def del_recipe():
     """Delete recipe from user's recipe box"""
 
     user_id = session.get("user_id")
-    user = User.query.filter(User.user_id==user_id).one()
     recipe_id = int(request.form.get("recipe_id"))
-    recipe_to_del = UserRecipe.query.filter(UserRecipe.recipe_id==recipe_id, UserRecipe.user_id==user.user_id).one() 
-    db.session.delete(recipe_to_del)
-    db.session.commit()
+    result = delete_recipe(user_id, recipe_id)
 
-    return jsonify({})
+    return result
 
 
 @app.route('/review_recipe', methods=["POST"])
 def review_recipe():
     user_id = session.get("user_id")
-    user = User.query.filter(User.user_id==user_id).one()
     recipe_id = request.form.get("recipe_id") 
-    cooked_recipe = UserRecipe.query.filter(UserRecipe.user_id==user_id, UserRecipe.recipe_id==recipe_id).one()
-    cooked_recipe.cooked = True 
+    result = add_to_board(user_id, recipe_id)
 
-    if not Review.query.filter(Review.user_id==user_id, Review.recipe_id==recipe_id).all():
-        new_review = Review(recipe_id=recipe_id, user_id=user_id)
-        db.session.add(new_review)
-    
-    db.session.commit()
-
-    return jsonify({})
+    return result
 
 
 photos = UploadSet("photos", IMAGES)
@@ -407,44 +315,27 @@ def upload():
     user_id = session.get("user_id")
     photo = request.files["photo"]
     recipe_id = request.form.get("recipe_id")
-    user = User.query.filter(User.user_id==user_id).one()
-    firstname = user.firstname
-    lastname = user.lastname
 
     try:    
         if request.method == "POST" and "photo" in request.files:
             filename = photos.save(photo)
-            flash("Photo saved.")
     except:
-        flash("Not a valid photo file. Please try again.")
-        return redirect('/board/'+str(user_id))
+        # flash("Not a valid photo file. Please try again.")
+        return jsonify({})
 
-    #Add photo url to Review object
-    review = Review.query.filter(Review.user_id==user_id, Review.recipe_id==recipe_id).one()
-    review.photo_url = filename
-    print review.photo_url
-    db.session.commit()
+    result = upload_photo(user_id, filename, recipe_id)
 
-    return jsonify({'photo': review.photo_url, 'firstname': firstname, 'lastname': lastname})
-    # return redirect('/board/'+str(user_id))
+    return result
 
 
 @app.route('/del_photo', methods=["POST"])
 def del_photo():
 
     user_id = session.get("user_id")
-    print user_id
-    user = User.query.filter(User.user_id==user_id).one()
     recipe_id = request.form.get("recipe_id") 
-    print recipe_id
-    review = Review.query.filter(Review.user_id==user_id, Review.recipe_id==recipe_id).one()
+    result = delete_photo(user_id, recipe_id)
 
-    review.photo_url = None
-
-    db.session.commit()
-
-    # return redirect('/board/'+str(user_id))
-    return jsonify({})
+    return result
 
 
 @app.route('/write_review', methods=["POST"])
@@ -452,13 +343,9 @@ def write_review():
     user_id = session.get("user_id")
     recipe_id = request.form.get("recipe_id")
     submitted_review = request.form.get("review")
+    result = create_review(user_id, recipe_id, submitted_review)
 
-    this_review = Review.query.filter(Review.user_id==user_id, Review.recipe_id==recipe_id).one()
-    this_review.review = submitted_review
-    db.session.commit()
-
-    return jsonify({'review': submitted_review})
-
+    return result
 
 
 

@@ -5,8 +5,14 @@
 {% block content %}
 
     <h2>Ingredient Inventory</h2>
-    {% if user.ingredients %}
+    <h3>Add Ingredient</h3>
+    <form action="/add_ingred" method="POST" id="add-ingred">
+      <input type="text" name="ingredient" id="ingredient">
+      <input type="submit" value="Add">
+    </form>
+      
     <ul id="ingred_list">
+    {% if user.ingredients %}
 
     {% for ingredient in user.ingredients %}
         <li id="ingredient-{{ingredient.ingred_id}}">{{ ingredient.ingred_name.title() }}</li>
@@ -16,18 +22,12 @@
           <button type="submit" class="delete-button" name="ingredient" value="{{ ingredient.ingred_id }}">x</button>
         </form>
     {% endfor %}
-      </ul>
-
-
+    </ul>
     {% endif %}
 
 
 
-    <h3>Add Ingredient</h3>
-      <form action="/add_ingred" method="POST" id="add-ingred">
-        <input type="text" name="ingredient" id="ingredient">
-        <input type="submit" value="Add">
-      </form>
+
 
 
 

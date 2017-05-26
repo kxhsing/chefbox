@@ -4,13 +4,14 @@
 
 {% block content %}
 
-
-<h2>Sign up</h2>
+<h2>Sign Up</h2>
 <form action="/register" method="POST">
     First Name: <input type="text" name="firstname" id="firstname"><br>
     Last Name: <input type="text" name="lastname" id="lastname"><br>
-    Email Address: <input type="email" name="email" id="email"><br>
-    Password: <input type="password" name="password" id="password"><br>
+    Email Address: <input type="email" name="email" id="email" required="required"><br>
+    Password: <input type="password" name="password" id="password" required="required"><br>
+    Confirm Password: <input name="password_confirm" required="required" type="password" id="password_confirm" oninput="check(this)" /><br>
+
     <input type="submit" name="submit">
 </form>
 
@@ -23,5 +24,15 @@
 </form>
 
 
+<script>
+   function check(input) {
+        if (input.value != document.getElementById('password').value) {
+            input.setCustomValidity('Password Must be Matching.');
+        } else {
+            // input is valid -- reset the error message
+            input.setCustomValidity('');
+        }
+    }
+</script>
 
 {% endblock %}

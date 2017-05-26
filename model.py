@@ -61,7 +61,8 @@ class Recipe(db.Model):
     source_name = db.Column(db.String(100), nullable=True)
     url = db.Column(db.Text, nullable=True, unique=True)
     instructions = db.Column(db.Text, nullable=False)
-
+    image = db.Column(db.Text, nullable=True, unique=True)
+    
     #Define association relationship with ingredient
     ingredients = db.relationship("Ingredient", secondary="recipe_ingredients", 
                                     backref="recipes") #will only lead to name of ingreds

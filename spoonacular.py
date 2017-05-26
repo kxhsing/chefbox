@@ -1,7 +1,5 @@
 import requests
-
 import os
-
 import json
 
 #####SPOONACULAR ENDPOINTS - all GET requests
