@@ -62,7 +62,7 @@ class Recipe(db.Model):
     url = db.Column(db.Text, nullable=True, unique=True)
     instructions = db.Column(db.Text, nullable=False)
     image = db.Column(db.Text, nullable=True, unique=True)
-    
+
     #Define association relationship with ingredient
     ingredients = db.relationship("Ingredient", secondary="recipe_ingredients", 
                                     backref="recipes") #will only lead to name of ingreds
@@ -164,15 +164,30 @@ def example_data():
     password='cookies' 
     hashed_pw = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
     karen = User(firstname='Karen', lastname='Hsing', email='karen@gmail.com', password=hashed_pw)
+
     password='noodles' 
     hashed_pw = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
     jesse = User(firstname='Jesse', lastname='Boeuf', email='jesse@gmail.com', password=hashed_pw)
+
     password='corolla' 
     hashed_pw = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
     cora = User(firstname='Cora', lastname='Car', email='cora@gmail.com', password=hashed_pw)
 
 
-    db.session.add_all([karen, jesse, cora])
+    thai_shrimp_pasta = Recipe(title="Thai Shrimp Pasta", 
+                            source_name="Taste of Home", 
+                            url="http://www.tasteofhome.com/Recipes/thai-shrimp-pasta", 
+                            instructions='{"Soak noodles according to package directions. Meanwhile, in a large dry skillet over medium heat, toast curry powder until aromatic, about 1-2 minutes. Stir in the coconut milk, shrimp, salt and pepper. Bring to a boil. Reduce heat; simmer, uncovered, for 5-6 minutes or until shrimp turn pink.","Drain noodles; add to pan. Stir in cilantro; heat through.","Serve with lime wedges if desired."}',
+                            image="https://spoonacular.com/recipeImages/Thai-Shrimp-Pasta-421073.jpg")
+
+    db.session.add_all([karen, jesse, cora, thai_shrimp_pasta])
+    db.session.flush()
+    thai_shrimp_pasta_id = Recipe.query.filter(Recipe.url=="http://www.tasteofhome.com/Recipes/thai-shrimp-pasta").first().recipe_id
+    
+    karen_thai_pasta = UserRecipe(recipe_id=thai_shrimp_pasta_id, user_id=user_id, cooked=False)
+    db.session.add(karen_thai_pasta)
+
+    
     db.session.commit()
 
 

@@ -19,5 +19,12 @@
 
 
 
+.search-result-photo {
+    width: 20rem;
+    height: 180px;
+    margin: -75px 0 0 -100px;
+    overflow: hidden;
 
+}
 
+/*.centered-and-cropped { object-fit: cover }*/

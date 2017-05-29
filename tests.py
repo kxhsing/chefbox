@@ -89,7 +89,7 @@ class TestUserIngredRecipeBoard(TestCase):
         db.drop_all()
 
     def test_dashboard(self):
-        """Test user's ingredient inventory"""
+        """Test user's dashboard"""
         user = db.session.query(User).filter(User.email=='karen@gmail.com').one()
         user_id = user.user_id
         firstname = user.firstname
@@ -98,13 +98,98 @@ class TestUserIngredRecipeBoard(TestCase):
             with c.session_transaction() as sess:
                 sess['user_id'] = user.user_id
 
-            result = c.get('/users/<user_id>',
-                            data={'user_id': user_id},
+            result = c.get('/users/'+str(user_id),
                             follow_redirects=True
                             )
-            # self.assertEqual(session['user_id'], user.user_id)
+
             self.assertIn("Hello", result.data)
             self.assertIn(firstname, result.data)
+
+    def test_unauthorized_user(self):
+        """Test case of unathorized user trying to access dashboard"""
+        user = db.session.query(User).filter(User.email=='karen@gmail.com').one()
+        user_id = user.user_id
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['user_id'] = user.user_id
+
+            result = c.get('/users/'+str(2),
+                            follow_redirects=True
+                            )
+
+            self.assertIn("You are not authorized to view this profile", result.data)
+
+
+    def test_ingred(self):
+        """Test user's Ingredient Inventory"""
+        user = db.session.query(User).filter(User.email=='karen@gmail.com').one()
+        user_id = user.user_id
+        firstname = user.firstname
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['user_id'] = user.user_id
+
+            result = c.get('/ingred/'+str(user_id),
+                            follow_redirects=True
+                            )
+
+            self.assertIn("Add Ingredient", result.data)
+
+
+    def test_recipes(self):
+        """Test user's Recipe Box"""
+        user = db.session.query(User).filter(User.email=='karen@gmail.com').one()
+        user_id = user.user_id
+        firstname = user.firstname
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['user_id'] = user.user_id
+
+            result = c.get('/recipes/'+str(user_id),
+                            follow_redirects=True
+                            )
+
+            self.assertIn("Mark completed recipes as \"Cooked\" to move them to your Chef Board", result.data)
+
+
+    def test_board_no_recipes(self):
+        """Test user's Chef Board"""
+        user = db.session.query(User).filter(User.email=='karen@gmail.com').one()
+        user_id = user.user_id
+        firstname = user.firstname
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['user_id'] = user.user_id
+
+            result = c.get('/recipes/'+str(user_id),
+                            follow_redirects=True
+                            )
+
+            self.assertIn("Chef Board", result.data)
+            self.assertIn("There are currently no completed recipes from your recipe box. Get cooking!", result.data)
+
+
+    def test_recipes_with_recipes(self):
+        """Test user's recipes with recipes in box"""
+        user = db.session.query(User).filter(User.email=='karen@gmail.com').one()
+        user_id = user.user_id
+        firstname = user.firstname
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess['user_id'] = user.user_id
+
+            result = c.get('/recipes/'+str(user_id),
+                            follow_redirects=True
+                            )
+
+            self.assertIn("Cooked", result.data)
+            self.assertIn("If you are no longer interested in a recipe, you can \"Remove\" it from your recipe box.", result.data)
+
 
 
 

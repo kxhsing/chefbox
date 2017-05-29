@@ -36,6 +36,34 @@ $(".instructions-button").on("click", function(){
 
   });
 
+
+function deletePhoto(evt) {
+  evt.preventDefault();
+  var thisButton = this;
+  // debugger;
+  var thisForm = this.parentElement;
+  var recipeID = this.value;
+  var thisDiv = $(thisForm).siblings("div.photo-with-credit");
+  var uploadButton = $(thisForm).siblings("button.upload-button");
+
+  var formInputs = {
+    "recipe_id": recipeID
+  };
+
+  $.post("/del_photo", formInputs, function(){
+
+    alert("Photo deleted.");
+    thisDiv.empty();
+    thisButton.remove();
+    uploadButton.text("Upload Photo");
+
+  });
+}
+
+$(".delete-photo-btn").on('click', deletePhoto);
+
+
+
 //Display upload photo form on click 
 $(".upload-button").on("click", function(){
   var thisButton = this;
@@ -63,6 +91,8 @@ function uploadPhoto(evt) {
 
 
   var form_data = new FormData(thisForm);
+  if (form_data.get('photo').name && (form_data.get('photo').type=="image/jpeg" || form_data.get('photo').type=="image/png")) {
+  
   $.ajax({
       type: 'POST',
       url: this.action,
@@ -72,49 +102,45 @@ function uploadPhoto(evt) {
       processData: false,
       async: false,
       success: function(data) {
-        if (data) {
           alert("Photo uploaded!");
           $(uploadButton).text("Update Photo");        
           var newPhoto = $(thisForm).siblings("div.photo-with-credit");
           newPhoto.html('<img src="/static/photos/'+data.photo+'"><br>Photo by '+data.firstname+' '+data.lastname);
-        }
-        else {
-          alert("Not a valid photo file. Please try again."); //why is this not working?
-        }
+          var newDelButton = $(thisForm).siblings("div.new-del-button");
+          newDelButton.html('<form action="/del_photo" method="POST" class="del-photo"><button type="submit" class="delete-photo-btn" name="review_id" value="'+recipeID+'">Delete Photo</button><input type="hidden" name="recipe_id" value="'+recipeID+'"></form>');
+          
+          $(".delete-photo-btn").on('click', function(){
 
+            evt.preventDefault();
+            var thisButton = this;
+            var thisForm = this.parentElement;
+            var recipeID = this.value;
+            var thisDiv = $(thisForm).siblings("div.photo-with-credit");
+            var formInputs = {
+              "recipe_id": recipeID
+            };
+
+            $.post("/del_photo", formInputs, function(){
+              alert("Photo deleted.");
+              thisDiv.empty();
+              thisButton.remove();
+            });
+
+            debugger;
+            newPhoto.empty();
+            newDelButton.empty();
+
+          });
       }
   });
+}
 
+else {
+  alert("Not a valid photo file!");
+}
 }
 
 $(".upload-form").on("submit", uploadPhoto);
-
-
-
-function deletePhoto(evt) {
-  evt.preventDefault();
-  var thisButton = this;
-  // debugger;
-  var thisForm = this.parentElement;
-  var recipeID = this.value;
-  var thisDiv = $(thisForm).siblings("div.photo-with-credit");
-  var uploadButton = $(thisForm).siblings("button.upload-button");
-
-  var formInputs = {
-    "recipe_id": recipeID
-  };
-
-  $.post("/del_photo", formInputs, function(){
-
-    alert("Photo deleted.");
-    thisDiv.empty();
-    thisButton.remove();
-    uploadButton.text("Upload Photo");
-
-  });
-}
-
-$(".delete-photo-btn").on('click', deletePhoto);
 
 
 
@@ -170,4 +196,3 @@ function writeReview(evt) {
 }
 
 $(".review-form").on("submit", writeReview);
-

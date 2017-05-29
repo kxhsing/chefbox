@@ -9,7 +9,60 @@
     {% if recipe_results_list %}
       <p>Save a recipe to import it into your recipe box. <br>
         Saved recipes will include recipe name, ingredients, ingredient units and measurements, instructions, and source URL.</p>
-          {% for recipe in recipe_results_list %}
+    <div class="card-columns">
+      {% for recipe in recipe_results_list %}
+        <div class="card">
+          <div class="card-block">
+            <h4 class="card-title">{{ recipe[1].title() }}</h4>
+            <p class="card-text">
+              via {% if recipe[3] and recipe[2] %}<a href="{{ recipe[3]}}" target="_blank" class="card-link"> {{ recipe[2] }} </a> 
+                        {% elif recipe[3] %}
+                          <a href="{{ recipe[3]}}" target="_blank" class="card-link"> [Original Source] </a> 
+                        {% else %} 
+                          {{ recipe[2] }}
+                        {% endif %}
+            </p>
+          </div>
+          <img class="card-img-top img-fluid" src="{{ recipe[4] }}" alt="Card image cap">
+          <div class="card-block">
+            <h5>Ingredients</h5>
+            <ul>
+              {% for ingredient in recipe[6] %}
+                <li>{{ ingredient }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div class="card-block">
+            <button type="button" class="instructions-button">View Instructions</button>
+            <ol class="recipe-instructions">
+              {% for instruction in recipe[5] %}
+                  <li>{{ instruction }}</li>
+              {% endfor %}
+            </ol>
+            <form action="/add_recipe" method="POST">
+              <button type="submit" class="add-recipe" name="recipe_id" value="{{ recipe[0] }}">Save Recipe</button>
+            </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+
+
+      {% if total_results > 10 and session['offset'] < 900 %}
+          <form action="/search_more" method="POST">
+                <button type="submit" name="more_results" value="10">More Results</button>
+          </form>
+      {% endif %}
+
+    {% else %}
+      <p>We couldn't find a recipe with the parameters you specified. Please search again.</p>
+
+    {% endif %}
+
+  <p><a href="/search_recipe">New Recipe Search</a></p>
+
+<!--           {% for recipe in recipe_results_list %}
             <table>
                   <tr>
                     <th>{{ recipe[1].title() }}</th>
@@ -54,29 +107,15 @@
                     </tr>
               </table>
               <p></p>
-            {% endfor %}
-
-      {% if total_results > 10 and session['offset'] < 900 %}
-          <form action="/search_more" method="POST">
-                <button type="submit" name="more_results" value="10">More Results</button>
-          </form>
-      {% endif %}
-
-    {% else %}
-      <p>We couldn't find a recipe with the parameters you specified. Please search again.</p>
-
-    {% endif %}
-
-  <p><a href="/search_recipe">New Recipe Search</a></p>
+            {% endfor %} -->
 
 
   <script>
 
        function addRecipe(evt) {
           evt.preventDefault();
-          // debugger
           var thisButton = this;
-          var thisTable = $(thisButton).parentsUntil("table");
+          var thisDiv = thisButton.parentElement.parentElement.parentElement;
 
 
           var formInputs = {
@@ -87,7 +126,7 @@
           $.post("/add_recipe", formInputs, function(){
 
             alert("Recipe saved!");
-            $(thisTable).fadeOut();
+            $(thisDiv).fadeOut();
 
 
           });
