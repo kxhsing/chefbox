@@ -18,7 +18,7 @@ from actions import delete_ingredient, add_ingredient, delete_recipe, add_to_boa
 app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
-app.secret_key = "secretsecretsecrets"
+app.secret_key = "jd8gakhHdiemvkldov"
 
 # Normally, if you use an undefined variable in Jinja2, it fails
 # silently. This is horrible. Fix this so that, instead, it raises an
@@ -273,7 +273,8 @@ def search_more():
         recipe_results_list = []
         total_results = 0
 
-    return render_template("recipe_results.html", user=user, recipe_results_list=recipe_results_list, total_results=total_results)
+    # return render_template("recipe_results.html", user=user, recipe_results_list=recipe_results_list, total_results=total_results)
+    return jsonify({'recipe_results_list': recipe_results_list, 'total_results': total_results})
 
 
 @app.route('/add_recipe', methods=["POST"])

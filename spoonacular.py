@@ -54,12 +54,12 @@ def process_bulk_recipes(bulk_recipe_results):
             recipe_source_url = recipe.get('sourceUrl')
             recipe_img = recipe['image']
 
-            steps = recipe['analyzedInstructions'][0]['steps']
             step_instructions = [] #create list for all instruction steps
-
-            for step in steps:
-                if len(step['step']) > 2:
-                    step_instructions.append(step['step'])
+            if recipe['analyzedInstructions']:
+                steps = recipe['analyzedInstructions'][0]['steps']
+                for step in steps:
+                    if len(step['step']) > 2:
+                        step_instructions.append(step['step'])
 
             ingredients = recipe['extendedIngredients'] # list of dictionaries. each dict contains info about all ingredients, including 'name', 'amount', 'unit'
 
