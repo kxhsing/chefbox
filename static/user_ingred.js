@@ -2,14 +2,21 @@
       // Add ingredient to inventory; stays on current page
       function ingredAddResult(result) {
         console.log(result);
-        var ingredList = $("#ingred_list");
+        var ingredList = $("#ingred-list");
         var ingredientName = result.ingredient;
         if (ingredientName) {
         var ingredID = result.ingred_id;
         console.log(ingredID);
-        ingredList[0].innerHTML = ingredList.html() + '<li>'+ingredientName+'</li> <form action="/del_ingred" method="post"> <button type="submit" class="delete-button" name="ingredient" class="delete-button" value="'+ingredID+'">x</button></form>';
-        alert("Added to inventory: " + ingredientName);
+        ingredList[0].innerHTML = ingredList.html() + '<tr><td>'+ingredientName+'</td><td><form action="/del_ingred" method="post"><button type="submit" class="delete-button btn btn-outline-secondary btn-sm" name="ingredient" value="'+ingredID+'">&times;</button></form></td></tr>';
+
+        // alert("Added to inventory: " + ingredientName);
         // $(".delete-button").on('click', delIngred);
+        var alertDiv = document.createElement("div"); 
+        $(alertDiv).addClass("alert alert-success alert-dismissible");
+        $(alertDiv).attr("role", "alert");
+        $(alertDiv).append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Added to inventory: <strong>'+ ingredientName+'</strong>');
+        $(alertDiv).appendTo("#alert-area");
+
         }
         else {
           alert("Ingredient exists already");
@@ -32,29 +39,25 @@
 
       // Delete ingredient from inventory; stays on current page
       function delIngred(evt) {
-        console.log('in delIngred');
         evt.preventDefault();
-
-
         var formInputs = {
           "ingredient": this.value
         };
 
         var thisButton = this;
-        var thisForm = $(thisButton).parent();
-        var thisButtonIngred = thisForm.prev();
-
+        var thisIngred = this.parentElement.parentElement.previousElementSibling;
+        var thisTR = this.parentElement.parentElement.parentElement;
 
         $.post("/del_ingred", formInputs, function(){
-          thisButton.remove();
-          thisButtonIngred.remove();
+          $(thisTR).remove();
 
-          alert("Removed from inventory: "+ $(thisButtonIngred).text());
+          alert("Removed from inventory: "+ thisIngred.innerText);
 
-        });
+
+        });;
       }
 
-      $("#ingred_list").on('click', ".delete-button", delIngred);
+      $("#ingred-list").on('click', ".delete-button", delIngred);
 
 
       

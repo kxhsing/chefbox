@@ -4,26 +4,36 @@
 
 {% block content %}
 
-    <h2>Ingredient Inventory</h2>
+    <h2>Ingredient Inventory</h2><br>
     <h3>Add Ingredient</h3>
     <form action="/add_ingred" method="POST" id="add-ingred">
       <input type="text" name="ingredient" id="ingredient">
-      <input type="submit" value="Add">
+      <input class="btn btn-primary btn-sm" type="submit" value="Add">
     </form>
       
-    <ul id="ingred_list">
+
+    <div id="alert-area"></div>
+
+    <table id="ingred-list">
     {% if user.ingredients %}
-
-    {% for ingredient in user.ingredients %}
-        <li id="ingredient-{{ingredient.ingred_id}}">{{ ingredient.ingred_name.title() }}</li>
-
-
-        <form action="/del_ingred" method="post">
-          <button type="submit" class="delete-button" name="ingredient" value="{{ ingredient.ingred_id }}">x</button>
-        </form>
+        <tr>
+            <th>Ingredients</th>
+        </tr>
+        {% for ingredient in user.ingredients %}
+        <tr>
+            <td>
+                {{ ingredient.ingred_name.title() }}
+            </td>
+            <td>
+                <form action="/del_ingred" method="post">
+                    <button type="submit" class="delete-button btn btn-outline-secondary btn-sm" name="ingredient" value="{{ ingredient.ingred_id }}">&times;</button>
+                </form>
+            </td>
+        </tr>
     {% endfor %}
-    </ul>
+    </table>
     {% endif %}
+
 
 
 

@@ -29,7 +29,7 @@
         <p>Include Ingredients from Inventory:</p>
         <ul id="ingred-list">
           {% for ingredient in user.ingredients %}
-              <li><input type="checkbox" name="search_ingredients" value="{{ ingredient.ingred_name }}" checked>{{ ingredient.ingred_name.title() }}</li>
+              <li><input type="checkbox" name="search_ingredients" value="{{ ingredient.ingred_name }}" checked> {{ ingredient.ingred_name.title() }}</li>
           {% endfor %}
         </ul>
 

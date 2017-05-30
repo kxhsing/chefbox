@@ -5,7 +5,7 @@
         evt.preventDefault();
 
         var thisButton = this;
-        var thisTable = $(thisButton).parentsUntil("table");
+        var thisDiv = thisButton.parentElement.parentElement.parentElement;
 
 
         var formInputs = {
@@ -16,7 +16,7 @@
         $.post("/del_recipe", formInputs, function(){
 
           alert("Recipe removed.");
-          $(thisTable).fadeOut();
+          $(thisDiv).fadeOut();
 
 
         });
@@ -45,7 +45,7 @@
         evt.preventDefault();
 
         var thisButton = this;
-        var thisTable = $(thisButton).parentsUntil("table");
+        var thisDiv = thisButton.parentElement.parentElement.parentElement;
 
 
         var formInputs = {
@@ -56,7 +56,7 @@
         $.post("/review_recipe", formInputs, function(){
 
           alert("Recipe moved to your Chef Board. Upload a photo & review the recipe there.");
-          $(thisTable).fadeOut();
+          $(thisDiv).fadeOut();
 
 
         });

@@ -19,8 +19,37 @@
 
 
   {% if 'user_id' in session %}
-    <a href="/logout"> Log Out </a><br>
-    <a href="/users/{{session['user_id']}}"> Dashboard </a><br>
+
+  <nav class="navbar sticky-top navbar-toggleable-md navbar-light bg-faded">
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+    <a class="navbar-brand" href="/users/{{session['user_id']}}">
+    <img src="/static/avocado.svg" width="30" height="30" class="d-inline-block align-top" alt="">
+    ChefBox </a>
+  <div class="collapse navbar-collapse" id="navbarText">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="/users/{{session['user_id']}}">Dashboard <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/search_recipe">Search Recipes</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/ingred/{{ user.user_id }}">Ingredient Inventory</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/recipes/{{ user.user_id }}">Recipe Box</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/board/{{ user.user_id }}">Chef Board</a>
+      </li>
+    </ul>
+    <span class="navbar-text">
+      <a href="/logout" class="log-out">Log Out</a>
+    </span>
+  </div>
+</nav>
 
 
   {% endif %}
