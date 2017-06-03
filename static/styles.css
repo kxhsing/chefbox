@@ -1,9 +1,93 @@
+#log-in {
+    float: right;
+    padding: .5rem 1rem;
+
+}
+
+#sign-up {
+    padding-top: 15%;
+    padding-left: 60%;
+    /*position: relative;*/
+
+}
+
+#signup-submit {
+    margin-left: 310px;
+}
+
+#dashboard-question {
+    text-align: center;
+}
+
+#dashboard-search {
+    text-align: center;
+}
+
+#food-fact {
+    text-align: center;
+}
+
+#dashboard-content {
+    padding: 120px;
+
+}
+
+
+#user-ingredient-list {
+    width: 100%;
+    margin-top: 30px;
+}
+
+#ingred-header {
+    text-align: center;
+    /*display: block;*/
+
+}
+.ingred-div {
+    width: 30%;
+    margin: 0 auto;
+   
+}
+
+.ingred-row {
+    margin-left: -30px;
+}
+
+.ingredient-box {
+     border: 1px solid;
+     padding-top: 10px;
+     padding-bottom: 10px;
+
+}
+
+.ingredient-box li {
+    padding: 5px 0 0 0px;
+
+}
+
+
+
+.delete-button {
+    margin-left: 30px;
+}
+
 
 
 .upload-form {
   display: none;
 }
 
+
+#search-form-query {
+    position: relative;
+    padding-top: 20px;
+    padding-left: 30px;
+    padding-bottom: 20px;
+    width: 30%;
+    border: 1px solid;
+    margin-left: 35%;
+    margin-bottom: 50px;
+}
 
 .review-form {
   display: none;
@@ -17,23 +101,83 @@
     display: none;
 }
 
+#alert-area {
+    width: 25%;
+    float: right;
+}
+
+#search-alerts {
+    width: 25%;
+    float: right;
+}
+
+#search-button-div {
+    margin-left: 33%;
+
+}
+
 .alert {
     float: right;
 }
 
-.add-recipe {
-    /*float: right;*/
+.end-results {
+    display: none;
+    text-align: center;
 }
 
-.load-on-bottom {
+h2 {
     text-align: center;
-    display: none;
+    padding-top: 20px;
 }
+
+#initial-load-more {
+    text-align: center;
+
+}
+
 
 .del-recipe {
-    display:inline;
+    display: inline;
+    float: right;
 }
 
-.review-recipe{
-    display:inline;
+.review-recipe {
+    display: inline;
+}
+
+
+.search-checkbox {
+    list-style:none;
+}
+
+
+.explanatory-header-text {
+    padding: .5rem 1rem;
+    text-align: center;
+}
+
+
+.div-to-center {
+    margin: 0 auto;
+
+}
+
+
+.button-align {
+
+    width:100%;
+}
+
+.button-to-align {
+    display: inline-block;
+}
+
+
+.form-align {
+    display: inline;
+}
+
+.add-recipe {
+    display: block;
+    margin: 0 auto;
 }

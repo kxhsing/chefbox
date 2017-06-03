@@ -4,37 +4,59 @@
 
 {% block content %}
 
+<div class="explanatory-header-text">
     <h2>Ingredient Inventory</h2><br>
     <h3>Add Ingredient</h3>
     <form action="/add_ingred" method="POST" id="add-ingred">
-      <input type="text" name="ingredient" id="ingredient">
+      <input class="col-2" type="text" name="ingredient" id="ingredient">
       <input class="btn btn-primary btn-sm" type="submit" value="Add">
     </form>
       
+</div>
+<div id="alert-area"></div>
 
-    <div id="alert-area"></div>
-
-    <table id="ingred-list">
+<div id="user-ingredient-list">
+    
     {% if user.ingredients %}
+        
+        <div class="ingred-div">
+            <h3 id="ingred-header">Ingredients</h3>
+            <ul class="ingredient-box" id="ingred-list">
+            {% for ingredient in user.ingredients %}
+                <li class="row ingred-row">
+                    <span class="ingredient col-sm-8"> 
+                        {{ ingredient.ingred_name.title() }} 
+                    </span>
+                    <div class="del-button-td col-sm-2">
+                        <button class="delete-button btn btn-outline-secondary btn-sm ingred-del-buttons" name="ingredient" value="{{ ingredient.ingred_id }}">&times;</button>
+                    </div>
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+    
+
+   <!--  <table id="ingred-list">
+        {#{% if user.ingredients %}#}
         <tr>
-            <th>Ingredients</th>
+            <th id="ingred-header">Ingredients</th>
         </tr>
-        {% for ingredient in user.ingredients %}
+        {#{% for ingredient in user.ingredients %}#}
         <tr>
             <td>
-                {{ ingredient.ingred_name.title() }}
+               {# {{ ingredient.ingred_name.title() }} #}
             </td>
-            <td>
+            <td class="del-button-td">
                 <form action="/del_ingred" method="post">
-                    <button type="submit" class="delete-button btn btn-outline-secondary btn-sm" name="ingredient" value="{{ ingredient.ingred_id }}">&times;</button>
+                    <button type="submit" class="delete-button btn btn-outline-secondary btn-sm ingred-del-buttons" name="ingredient" value="{#{{ ingredient.ingred_id }}#}">&times;</button>
                 </form>
             </td>
         </tr>
-    {% endfor %}
-    </table>
+    {#{% endfor %}#}
+    </table> -->
     {% endif %}
 
-
+</div>
 
 
 

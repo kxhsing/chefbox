@@ -5,21 +5,26 @@
         var ingredList = $("#ingred-list");
         var ingredientName = result.ingredient;
         if (ingredientName) {
-        var ingredID = result.ingred_id;
-        console.log(ingredID);
-        ingredList[0].innerHTML = ingredList.html() + '<tr><td>'+ingredientName+'</td><td><form action="/del_ingred" method="post"><button type="submit" class="delete-button btn btn-outline-secondary btn-sm" name="ingredient" value="'+ingredID+'">&times;</button></form></td></tr>';
+          var ingredID = result.ingred_id;
+          console.log(ingredID);
+          ingredList[0].innerHTML = ingredList.html() + '<li class="row ingred-row"><span class="ingredient col-sm-8"> '+ingredientName.charAt(0).toUpperCase()+ingredientName.slice(1)+
+          '</span><div class="del-button-td col-sm-2"><button class="delete-button btn btn-outline-secondary btn-sm ingred-del-buttons" name="ingredient" value="'+ingredID+'">&times;</button>'+
+          '</div></li>';
 
-        // alert("Added to inventory: " + ingredientName);
-        // $(".delete-button").on('click', delIngred);
-        var alertDiv = document.createElement("div"); 
-        $(alertDiv).addClass("alert alert-success alert-dismissible");
-        $(alertDiv).attr("role", "alert");
-        $(alertDiv).append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Added to inventory: <strong>'+ ingredientName+'</strong>');
-        $(alertDiv).appendTo("#alert-area");
+          // $(".delete-button").on('click', delIngred);
+          var alertDiv = document.createElement("div"); 
+          $(alertDiv).addClass("alert alert-success alert-dismissible");
+          $(alertDiv).attr("role", "alert");
+          $(alertDiv).append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Added to inventory: <strong>'+ ingredientName.charAt(0).toUpperCase()+ingredientName.slice(1)+'</strong>');
+          $(alertDiv).appendTo("#alert-area");
 
         }
         else {
-          alert("Ingredient exists already");
+          var alertDiv = document.createElement("div"); 
+          $(alertDiv).addClass("alert alert-warning alert-dismissible");
+          $(alertDiv).attr("role", "alert");
+          $(alertDiv).append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Ingredient exists already.');
+          $(alertDiv).appendTo("#alert-area");
         };
       }
 
@@ -45,13 +50,18 @@
         };
 
         var thisButton = this;
-        var thisIngred = this.parentElement.parentElement.previousElementSibling;
-        var thisTR = this.parentElement.parentElement.parentElement;
+        var thisIngred = this.parentElement.previousElementSibling;
+        console.log(thisIngred);
+        // var thisTR = this.parentElement.parentElement.parentElement;
+        var thisTR = this.parentElement.parentElement;
 
         $.post("/del_ingred", formInputs, function(){
           $(thisTR).remove();
-
-          alert("Removed from inventory: "+ thisIngred.innerText);
+          var alertDiv = document.createElement("div"); 
+          $(alertDiv).addClass("alert alert-warning alert-dismissible");
+          $(alertDiv).attr("role", "alert");
+          $(alertDiv).append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Removed from inventory: <strong>'+ thisIngred.innerText+'</strong>');
+          $(alertDiv).appendTo("#alert-area");
 
 
         });;

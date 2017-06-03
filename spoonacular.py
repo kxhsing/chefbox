@@ -7,6 +7,7 @@ search_recipe_complex = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.
 get_recipe_info_endpoint = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/{}/information"
 bulk_recipe_info = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/informationBulk"
 auto_complete_ingred = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/food/ingredients/autocomplete"
+random_food_trivia = "https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/food/trivia/random"
 
 YOURKEY = os.environ['YOURKEY']
 
@@ -118,7 +119,13 @@ def get_recipe_info(recipe_id):
 
     return saved_recipe
 
+def get_random_food_trivia():
+    """Get random food trivia from API"""
 
+    food_trivia = requests.get(random_food_trivia, headers=headers)
+    food_trivia = food_trivia.json()
+
+    return food_trivia
 
 
 if __name__ == "__main__":

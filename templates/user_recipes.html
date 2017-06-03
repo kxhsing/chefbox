@@ -3,11 +3,12 @@
 {% block title %}Recipe Box{% endblock %}
 
 {% block content %}
-
+<div class="explanatory-header-text">
     <h2>Recipe Box</h2>
-    <p>Mark completed recipes as "Cooked" to move them to your Chef Board, which will save each recipe and allow you to upload a photo and add a review!<br>
-      If you are no longer interested in a recipe, you can "Remove" it from your recipe box.
+    <p>Mark completed recipes as "Cooked" to move them to your Chef Board, where you can upload photos and add reviews of completed recipes!<br>
+      If you are no longer interested in a recipe, you can "Remove" it from your Recipe Box.
     </p>
+</div>
     {% if user.recipes %}
         {% if recipes_list %}
         <div class="card-columns">
@@ -40,12 +41,12 @@
             {% endfor %}
             </ol>
           </div>
-          <div class="card-footer">
-            <form action="/review_recipe" method="POST">
-              <button type="submit" class="review-recipe btn btn-primary" name="recipe_id" value="{{ recipe.recipe_id }}">Cooked</button>
+          <div class="card-footer button-align">
+            <form action="/review_recipe" method="POST" class="form-align">
+              <button type="submit" class="review-recipe btn btn-primary button-to-align" name="recipe_id" value="{{ recipe.recipe_id }}">Cooked</button>
             </form>
-            <form action="/del_recipe" method="POST">
-              <button type="submit" class="del-recipe btn btn-outline-danger btn-sm" name="recipe_id" value="{{ recipe.recipe_id }}">Remove</button>
+            <form action="/del_recipe" method="POST" class="form-align">
+              <button type="submit" class="del-recipe btn btn-outline-secondary button-to-align" name="recipe_id" value="{{ recipe.recipe_id }}">Remove</button>
             </form>
           </div>
           </div>

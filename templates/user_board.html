@@ -3,116 +3,105 @@
 {% block title %}Chef Board{% endblock %}
 
 {% block content %}
-
+<div class="explanatory-header-text">
     <h2>Chef Board</h2>
     {% if user.reviews %}
     <p>Upload a photo and write a review of your completed recipes below!
     </p>
-    <ul>
+  </div>
+<div id="alert-area"></div>
+    <div class="card-columns">  
     {% for review in user.reviews %}
-      <table id="user-review-table">
-                    <tr>
-                      <th>{{ review.recipe.title.title() }}</th>
-                    </tr>
-                    <tr>
-                      <td>Recipe via {% if review.recipe.url and review.recipe.source_name %}<a href="{{ review.recipe.url }}" target="_blank"> {{ review.recipe.source_name }} </a> 
-                        {% elif review.recipe.url %}
-                          <a href="{{ review.recipe.url }}" target="_blank"> [Original Source] </a> 
-                        {% else %} 
-                          {{ review.recipe.source_name }}
-                        {% endif %}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="photo-with-credit">
-                        {% if review.photo_url %}
-                          <img src="/static/photos/{{ review.photo_url }}"><br>
-                          Photo by {{ user.firstname }} {{ user.lastname }}<br>
-                        {% endif %}
-                        </div>
-                        <button type="button" class="upload-button">
-                          {% if review.photo_url %}
-                            Update Photo
-                          {% else %}
-                            Upload Photo
-                          {% endif %}
-                        </button>
-                        <form method="POST" enctype="multipart/form-data" action="{{ url_for('upload') }}" class="upload-form">
-                          <input type="file" name="photo"><br>
-                          <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}" class="photo-recipe-id">
-                          <input type="submit">
-                        </form>
-                        {% if review.photo_url %}
-                          <form action="/del_photo" method="POST" class="del-photo">
-                            <button type="submit" class="delete-photo-btn" name="review_id" value="{{ review.recipe_id }}">Delete Photo</button>
-                            <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
-                          </form>
-                        {% endif %}
-                        <div class="new-del-button">
-                        </div>
-                      </td>
-                      </tr>
-                      <tr> 
-                        <td>
-                          {% if not review.review %}
-                          <div class="review">
-                          </div>
-                          <form action="/write_review" method="POST" class="review-form" id="{{ review.review_id }}"> 
-                            <textarea form="{{ review.review_id }}" name="review"></textarea><br>
-                            <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
-                            <input type="submit" value="Submit">
-                          </form>
-                          <button type="button" class="edit-review-btn">Review Recipe</button><br>
-                          {% else %}
-                            Review<br>
-                            <div class="review">{{ review.review }}<br>
-                            </div>
-                              <form action="/write_review" method="POST" class="review-form" id="{{ review.review_id }}">
-                                <textarea form="{{ review.review_id }}" name="review">{{ review.review }}</textarea><br>
-                                <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
-                                <input type="submit" class="edited-review">
-                              </form>
-                            <button type="button" class="edit-review-btn">Edit Review</button>
-                          {% endif %}
-
-                        </td>
-                      </tr>
-
-                      <tr>
-                        <td>Ingredients<br>
-                          <ul>
-                          {% for ingredient in review.recipe.ingredient_info %}
-                              <li>{{ ingredient.ingred_info }}</li>
-                          {% endfor %}
-                        </ul>
-                        </td>
-                      </tr>
-                        <tr>
-                          <td>
-                            {% set instruction_list = review.recipe.instructions[2:-2].split("\",\"") %}
-                            <button type="button" class="instructions-button">View Instructions</button>
-                            <ol class="recipe-instructions">
-                            {% for instruction in instruction_list %}
-                              <li>{{ instruction }}</li>
-                            {% endfor %}
-                            </ol>
-                          </td>
-                        </tr>
-
-                </table>
-                <p></p>
-
-      {% endfor %}
+      <div class="card">
+        <div class="card-block">  
+          <h4 class="card-title">{{ review.recipe.title.title() }}</h4>
+          <p class="card-text">
+            Recipe via {% if review.recipe.url and review.recipe.source_name %}<a href="{{ review.recipe.url }}" target="_blank" class="card-link">  {{ review.recipe.source_name }} </a> 
+                      {% elif review.recipe.url %}
+                        <a href="{{ review.recipe.url }}" target="_blank" class="card-link"> [Original Source] </a> 
+                      {% else %} 
+                        {{ review.recipe.source_name }}
+                      {% endif %}
+          </p>
+        </div>
+      <div class="card-block">
+        <div class="photo-with-credit">
+          {% if review.photo_url %}
+            <img class="card-img-top img-fluid" src="/static/photos/{{ review.photo_url }}"><br>
+            Photo by {{ user.firstname }} {{ user.lastname }}<br>
+          {% endif %}
+        </div>
+        <button type="button" class="upload-button btn btn-primary btn-sm">
+          {% if review.photo_url %}
+            Update Photo
+          {% else %}
+            Upload Photo
+          {% endif %}
+        </button>
+        <form method="POST" enctype="multipart/form-data" action="{{ url_for('upload') }}" class="upload-form">
+          <input type="file" name="photo"><br>
+          <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}" class="photo-recipe-id">
+          <input type="submit" class="btn btn-primary btn-sm">
+        </form>
+        {% if review.photo_url %}
+          <form action="/del_photo" method="POST" class="del-photo">
+            <button type="submit" class="delete-photo-btn btn btn-secondary btn-sm" name="review_id" value="{{ review.recipe_id }}">Delete Photo</button>
+            <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
+          </form>
+        {% endif %}
+        <div class="new-del-button">
+        </div>
+      </div>
+      <div class="card-block">
+        <h5>Recipe Review</h5>
+        {% if not review.review %}
+          <div class="review">
+          </div>
+          <form action="/write_review" method="POST" class="review-form" id="{{ review.review_id }}"> 
+            <textarea form="{{ review.review_id }}" name="review"></textarea><br>
+            <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
+            <input type="submit" value="Submit" class="btn btn-primary btn-sm">
+          </form>
+          <button type="button" class="edit-review-btn btn btn-outline-primary btn-sm">Review Recipe</button><br>
+        {% else %}
+          <div class="review">{{ review.review }}<br>
+          </div>
+            <form action="/write_review" method="POST" class="review-form" id="{{ review.review_id }}">
+              <textarea form="{{ review.review_id }}" name="review">{{ review.review }}</textarea><br>
+              <input type="hidden" name="recipe_id" value="{{ review.recipe_id }}">
+              <input type="submit" class="edited-review btn btn-primary btn-sm">
+            </form>
+          <button type="button" class="edit-review-btn btn btn-outline-primary btn-sm">Edit Review</button>
+        {% endif %}
+      </div>
+      <div class="card-block">
+        <h5>Ingredients</h5>
+        <ul>
+          {% for ingredient in review.recipe.ingredient_info %}
+            <li>{{ ingredient.ingred_info }}</li>
+          {% endfor %}
         </ul>
+        <button type="button" class="instructions-button btn btn-outline-info">View Instructions</button><br>
+        {% set instruction_list = review.recipe.instructions[2:-2].split("\",\"") %}
+        <ol class="recipe-instructions">
+        {% for instruction in instruction_list %}
+          <li>{{ instruction }}</li>
+        {% endfor %}
+        </ol>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+
 
 
     {% else %}
-      <p>There are currently no completed recipes from your recipe box. Get cooking!</p>
+      <p>There are currently no completed recipes from your recipe box. <a href="/recipes/{{session['user_id']}}">Get cooking</a>!</p>
 
     {% endif %}
 
-  <p><a href="/recipes/{{ user.user_id }}">Recipe Box</a></p>
+
 
 
  <script src="/static/user_board.js"></script>

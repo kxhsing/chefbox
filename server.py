@@ -11,7 +11,7 @@ import os
 import json
 import bcrypt
 from model import User, Recipe, Ingredient, RecipeIngredient, UserIngredient, UserRecipe, Review, connect_to_db, db
-from spoonacular import get_recipe_request, get_recipe_info
+from spoonacular import get_recipe_request, get_recipe_info, get_random_food_trivia
 from actions import delete_ingredient, add_ingredient, delete_recipe, add_to_board, upload_photo, delete_photo, create_review, add_new_recipe
 
 
@@ -67,7 +67,7 @@ def register_complete():
         return redirect("/")
     else:
         flash("User email already exists.")
-        return redirect("/register")
+        return redirect("/")
 
 
 @app.route('/login', methods=["POST"])
@@ -85,7 +85,6 @@ def login_check():
         if bcrypt.checkpw(password.encode('utf8'), user.password.encode('utf8')):
             session['user_id'] = user.user_id 
             print session['user_id']
-            flash("You are logged in")
             return redirect("/users/"+str(user.user_id))
         else:
             flash("Password is incorrect, please try again")
@@ -97,7 +96,7 @@ def login_check():
 @app.route('/logout')
 def logout():
     """Logs out user."""
-    flash("You are logged out.")
+    # flash("Log out success!")
     del session["user_id"]
 
     return redirect("/")
@@ -115,7 +114,12 @@ def show_user_info(user_id):
 
     user = User.query.filter(User.user_id==user_id_session).one()
 
-    return render_template("dashboard.html", user=user)
+    trivia = get_random_food_trivia()
+    print trivia
+
+    trivia_text = trivia['text']
+
+    return render_template("dashboard.html", user=user, trivia=trivia_text)
 
 
 @app.route('/recipes/<user_id>')
@@ -362,7 +366,7 @@ if __name__ == "__main__":
     connect_to_db(app)
 
     # Use the DebugToolbar
-    DebugToolbarExtension(app)
+    # DebugToolbarExtension(app)
 
 
     

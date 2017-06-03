@@ -4,14 +4,17 @@
 
 {% block content %}
 
-
-    <h2>Search for a Recipe</h2>
+<div class="explanatory-header-text">
+    <h2>Search for Recipes</h2>
+</div>
+<div id="search-alerts"></div>
+<div id="search-form-query">
 
     {% if not user.ingredients %}
       <p>Add ingredients to include in search:</p>
       <form action="/add_ingred" method="POST" id="new-ingred">
         <input type="text" name="ingredient" id="new-ingredient">
-        <input type="submit" value="Add">
+        <input class="btn btn-primary btn-sm" type="submit" value="Add">
       </form>
 
     {% endif %}
@@ -20,16 +23,16 @@
     <p>Add ingredient to search query:</p>
       <form action="/add_ingred" method="POST" id="add-ingred">
         <input type="text" name="ingredient" id="ingredient">
-        <input type="submit" value="Add">
+        <input class="btn btn-primary btn-sm" type="submit" value="Add">
       </form>
     {% endif %}
-
+    <br>
     <form action="/request_recipe" method="POST">
       {% if user.ingredients %}
         <p>Include Ingredients from Inventory:</p>
         <ul id="ingred-list">
           {% for ingredient in user.ingredients %}
-              <li><input type="checkbox" name="search_ingredients" value="{{ ingredient.ingred_name }}" checked> {{ ingredient.ingred_name.title() }}</li>
+              <li class="search-checkbox"><input type="checkbox" name="search_ingredients" value="{{ ingredient.ingred_name }}" checked> {{ ingredient.ingred_name.title() }}</li>
           {% endfor %}
         </ul>
 
@@ -43,13 +46,13 @@
           (optional):<br>
             <ul>
             {% for cuisine in cuisines %}
-                <li><input type="checkbox" name="cuisines" value="{{ cuisine }}">{{ cuisine.title() }}</li>
+                <li class="search-checkbox"><input type="checkbox" name="cuisines" value="{{ cuisine }}"> {{ cuisine.title() }}</li>
             {% endfor %}
             </ul><br>
 
 
           Dietary Restrictions: 
-          <select name="diet">
+          <select class="custom-select" name="diet">
             <option value="">None</option><br>
             {% for diet in diets %}
             <option value="{{ diet }}">{{ diet.title() }}</option><br>
@@ -61,13 +64,15 @@
           Allergies or Intolerances: 
             <ul>
             {% for intolerance in intolerances %}
-                <li><input type="checkbox" name="intolerances" value="{{ intolerance }}">{{ intolerance.title() }}</li>
+                <li class="search-checkbox"><input type="checkbox" name="intolerances" value="{{ intolerance }}"> {{ intolerance.title() }}</li>
             {% endfor %}
             </ul><br>
-        <input type="submit" value="Search">
+        <div id="search-button-div">
+        <input class="btn btn-primary" type="submit" value="Search">
+      </div>
         </form>
 
-
+</div>
 
 
 <script src="/static/search_recipe.js"></script>

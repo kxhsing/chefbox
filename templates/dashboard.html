@@ -3,16 +3,21 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-
+<div id="dashboard-content">
     <h2>Hello, {{ user.firstname }}!</h2><br>
 
-    <p><a href="/search_recipe">Search Recipes</a></p>
+    <div id="food-fact">
+        <p><h4>Random Food Fact for Thought</h4>
+            {{ trivia }}
+        </p><br>
+    </div>
+
+    <p><h5 id="dashboard-question">What will you be cooking today?</h5></p>
+    <p id="dashboard-search"><a href="/search_recipe">Search for Recipes</a></p>
 
 
-    <p><a href="/ingred/{{ user.user_id }}">Ingredient Inventory</a></p>
-    <p><a href="/recipes/{{ user.user_id }}">Recipe Box</a></p>
-    <p><a href="/board/{{ user.user_id }}">Chef Board</a></p>
 
 
+</div>
 
 {% endblock %}

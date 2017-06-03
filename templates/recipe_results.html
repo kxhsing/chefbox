@@ -3,12 +3,13 @@
 {% block title %}Recipe Results{% endblock %}
 
 {% block content %}
-
+<div class="explanatory-header-text">
     <h2>Recipe Results</h2>
-
+</div>
+<div class="explanatory-header-text">
     {% if recipe_results_list %}
       <p>Save a recipe to import it into your recipe box. </p>
-
+</div>
     <div class="card-columns">
       {% for recipe in recipe_results_list %}
         <div class="card">
@@ -37,6 +38,8 @@
                   <li>{{ instruction }}</li>
               {% endfor %}
             </ol>
+          </div>
+          <div class="card-footer">
             <form action="/add_recipe" method="POST">
               <button type="submit" class="add-recipe btn btn-primary" name="recipe_id" value="{{ recipe[0] }}">Save Recipe</button>
             </form>
@@ -44,30 +47,25 @@
       </div>
       {% endfor %}
     </div>
+    {% if total_results > 10 %}
+      <p id="initial-load-more">Loading More...</p>
+    {% endif %}
 
-
-
-<!--       {% if total_results > 10 and session['offset'] < 900 %}
-          <form action="/search_more" method="POST">
-                <button type="submit" name="more_results" value="10">More Results</button>
-          </form>
-      {% endif %} -->
 
     {% else %}
-      <p>We couldn't find a recipe with the parameters you specified. Please search again.</p>
+    <div class="explanatory-header-text">
+      <p>We couldn't find a recipe with the parameters you specified. Please <a href="/search_recipe">search again.</a></p>
+    </div>
 
     {% endif %}
 
-  <p class="load-on-bottom">Loading More...</p>
-  
 
- 
+  <p class="end-results">End of Results</p>
+  
 
 <script src="/static/recipe_results.js"></script>
 
 
 {% endblock %}
-
-
 
 

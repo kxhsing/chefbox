@@ -15,7 +15,8 @@
 
         $.post("/del_recipe", formInputs, function(){
 
-          alert("Recipe removed.");
+          // alert("Recipe removed.");
+          $(thisButton).html("&#10004");
           $(thisDiv).fadeOut();
 
 
@@ -54,9 +55,11 @@
 
 
         $.post("/review_recipe", formInputs, function(){
-
-          alert("Recipe moved to your Chef Board. Upload a photo & review the recipe there.");
-          $(thisDiv).fadeOut();
+          // debugger;
+          var cookedDiv = thisButton.parentElement.previousElementSibling;
+          console.log(cookedDiv);
+          $(thisButton).replaceWith("Recipe moved to Chef Board!");
+          $(thisDiv).fadeOut(1000);
 
 
         });

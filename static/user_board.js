@@ -1,24 +1,24 @@
 //Remove recipe from UserRecipe
-function deleteRecipe(evt) {
-  evt.preventDefault();
+// function deleteRecipe(evt) {
+//   evt.preventDefault();
 
-  var thisButton = this;
-  var thisTable = $(thisButton).parentsUntil("table");
+//   var thisButton = this;
+//   var thisTable = $(thisButton).parentsUntil("table");
 
 
-  var formInputs = {
-    "recipe_id": this.value
-  };
+//   var formInputs = {
+//     "recipe_id": this.value
+//   };
 
-  $.post("/del_recipe", formInputs, function(){
+//   $.post("/del_recipe", formInputs, function(){
 
-    alert("Recipe removed.");
-    $(thisTable).fadeOut();
+//     alert("Recipe removed.");
+//     $(thisTable).fadeOut();
 
-  });
-}
+//   });
+// }
 
-$(".del-recipe").on('click', deleteRecipe);
+// $(".del-recipe").on('click', deleteRecipe);
 
 
 //Display instructions on click 
@@ -37,13 +37,14 @@ $(".instructions-button").on("click", function(){
   });
 
 
-function deletePhoto(evt) {
+$(".card-columns").on('click', ".delete-photo-btn", function (evt) {
   evt.preventDefault();
   var thisButton = this;
-  // debugger;
+
   var thisForm = this.parentElement;
   var recipeID = this.value;
   var thisDiv = $(thisForm).siblings("div.photo-with-credit");
+  debugger;
   var uploadButton = $(thisForm).siblings("button.upload-button");
 
   var formInputs = {
@@ -52,29 +53,22 @@ function deletePhoto(evt) {
 
   $.post("/del_photo", formInputs, function(){
 
-    alert("Photo deleted.");
+    // alert("Photo deleted.");
     thisDiv.empty();
     thisButton.remove();
     uploadButton.text("Upload Photo");
 
   });
-}
-
-$(".delete-photo-btn").on('click', deletePhoto);
+});
 
 
 
 //Display upload photo form on click 
 $(".upload-button").on("click", function(){
   var thisButton = this;
+  // debugger;
   var uploadForm = $(thisButton).siblings("form.upload-form");
-  $(uploadForm).toggle();
-  // if ($(thisButton).text()=="Upload Photo" || $(thisButton).text()=="Update Photo") {
-  // $(thisButton).text("Cancel");
-  // }
-  // else {
-  //   $(thisButton).text("Upload Photo");
-  // }   
+  $(uploadForm).toggle(); 
 
   });
 
@@ -102,12 +96,12 @@ function uploadPhoto(evt) {
       processData: false,
       async: false,
       success: function(data) {
-          alert("Photo uploaded!");
+          // alert("Photo uploaded!");
           $(uploadButton).text("Update Photo");        
           var newPhoto = $(thisForm).siblings("div.photo-with-credit");
-          newPhoto.html('<img src="/static/photos/'+data.photo+'"><br>Photo by '+data.firstname+' '+data.lastname);
+          newPhoto.html('<img class="card-img-top img-fluid" src="/static/photos/'+data.photo+'"><br>Photo by '+data.firstname+' '+data.lastname);
           var newDelButton = $(thisForm).siblings("div.new-del-button");
-          newDelButton.html('<form action="/del_photo" method="POST" class="del-photo"><button type="submit" class="delete-photo-btn" name="review_id" value="'+recipeID+'">Delete Photo</button><input type="hidden" name="recipe_id" value="'+recipeID+'"></form>');
+          newDelButton.html('<form action="/del_photo" method="POST" class="del-photo"><button type="submit" class="delete-photo-btn btn btn-secondary btn-sm" name="review_id" value="'+recipeID+'">Delete Photo</button><input type="hidden" name="recipe_id" value="'+recipeID+'"></form>');
           
           $(".delete-photo-btn").on('click', function(){
 
@@ -121,12 +115,11 @@ function uploadPhoto(evt) {
             };
 
             $.post("/del_photo", formInputs, function(){
-              alert("Photo deleted.");
+              // alert("Photo deleted.");
               thisDiv.empty();
               thisButton.remove();
             });
 
-            debugger;
             newPhoto.empty();
             newDelButton.empty();
 
@@ -136,7 +129,12 @@ function uploadPhoto(evt) {
 }
 
 else {
-  alert("Not a valid photo file!");
+  // alert("Not a valid photo file!");
+  var alertDiv = document.createElement("div"); 
+  $(alertDiv).addClass("alert alert-warning alert-dismissible");
+  $(alertDiv).attr("role", "alert");
+  $(alertDiv).append('<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Not a valid photo file!');
+  $(alertDiv).appendTo("#alert-area");
 }
 }
 
@@ -187,7 +185,7 @@ function writeReview(evt) {
   $.post("/write_review", formInputs, function (result) {
     console.log(result);
     $(thisForm).hide();
-    alert("Recipe reviewed!");
+    // alert("Recipe reviewed!");
     var newReview = result.review;
     thisDiv.text(newReview);
     thisDiv.show();
