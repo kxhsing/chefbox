@@ -4,6 +4,7 @@
   <title>ChefBox - {% block title %} title {% endblock %}</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
   <link rel="stylesheet" href="/static/styles.css">
+  <link href="https://fonts.googleapis.com/css?family=Alice|Amaranth:400,700|Hind|Kaushan+Script" rel="stylesheet">
 </head>
 
 <body>
@@ -25,8 +26,8 @@
     <span class="navbar-toggler-icon"></span>
   </button>
     <a class="navbar-brand" href="/users/{{session['user_id']}}">
-    <img src="/static/avocado.svg" width="30" height="30" class="d-inline-block align-top" alt="">
-    ChefBox </a>
+    <img src="/static/avocado.svg" width="30" height="30" class="d-inline-block align-top" alt=""><span class="chef">
+    Chef</span><span class="box"> Box</span> </a>
   <div class="collapse navbar-collapse" id="navbarText">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">

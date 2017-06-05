@@ -229,6 +229,7 @@ def request_recipe():
     intolerances = request.form.getlist('intolerances')
     diet = request.form.get('diet')
     offset = 0
+    query = request.form.get('query')
 
     #Save user's search parameters in session in case want to search more
     session['include_ingred'] = include_ingredients 
@@ -236,8 +237,10 @@ def request_recipe():
     session['intolerances'] = intolerances
     session['diet'] = diet
     session['offset'] = offset
+    session['query'] = query
 
-    result = get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset)
+
+    result = get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset, query)
     if result:
         recipe_results_list = result[1]
         total_results = result[0]
@@ -266,9 +269,10 @@ def search_more():
     diet = session.get("diet")
     cuisines = session.get("cuisines")
     intolerances = session.get("intolerances")
+    query = session.get("query")
 
 
-    result = get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset)
+    result = get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset, query)
 
     if result:
         recipe_results_list = result[1]

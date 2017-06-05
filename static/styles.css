@@ -1,35 +1,206 @@
+#chef-box {
+    color: white;
+    font-size: 5em;
+    padding-right: 50px;
+    padding-top: 50px;
+}
+
+.chef {
+    font-family: 'Kaushan Script', cursive;
+}
+
+.box {
+    /*font-family: 'Amaranth', sans-serif;*/
+    font-family: 'Alice', serif;
+
+}
+
+
+a, a:link, a:hover, a:active, a:visited {
+    color: #425460;
+}
+
+
+.btn {
+    font-family: 'Hind', sans-serif;
+
+}
+
+.btn-primary {
+    background-color: #425460;
+    border: none;
+    
+}
+
+.btn-primary:hover {
+    background-color: #6A6A6A;
+    border: none;
+    
+}
+
+.btn-outline-info, .btn-outline-info:visited {
+    border-color: #88B04B;
+    color: #88B04B;
+
+}
+
+.btn-outline-info:hover,
+.btn-outline-info:active,
+.btn-outline-info:focus {
+    background-color: #88B04B;
+    border-color: #88B04B;
+    color: white;
+}
+
+.btn-secondary, 
+.btn-secondary:visited, 
+.btn-outline-primary, 
+.btn-outline-primary:visited {
+    border-color: #425460;
+    color: #425460;
+
+}
+
+.btn-secondary:hover,
+.btn-secondary:active,
+.btn-secondary:focus, 
+.btn-outline-primary:hover, 
+.btn-outline-primary:active, 
+.btn-outline-primary:focus {
+    background-color: #425460;
+    border-color: #425460;
+    color: white;
+}
+
+
+
+.delete-button {
+    color: #425460;
+    border: #425460 solid 1px;
+}
+
+body {
+    font-family: 'Hind', sans-serif;
+
+}
+
+h2 {
+    text-align: center;
+    padding-top: 20px;
+    font-family: 'Alice', serif;
+}
+
+h1 {
+    text-align: center;
+    padding-top: 10px;
+    font-family: 'Alice', serif;
+
+}
+
 #log-in {
     float: right;
     padding: .5rem 1rem;
 
 }
 
+.log-out {
+    text-decoration: none;
+}
+
 #sign-up {
-    padding-top: 15%;
-    padding-left: 60%;
+    padding-top: 1%;
+    padding-left: 67%;
     /*position: relative;*/
 
 }
 
-#signup-submit {
-    margin-left: 310px;
+#homepage-bg {
+    background-image:linear-gradient(to bottom, rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.3) 100%), url("/static/images/eggs-tomato.jpeg");
+    background-size: 100%;
+    background-color: #000000;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
+
+#signup-submit {
+    margin-left: 245px;
+    background-color: #88B04B;
+    border: none;
+}
+
+#signup-submit:hover {
+    background-color: #6A6A6A;
+    border: none; 
+
+}
+
+#dashboard-bg {
+    background-image:linear-gradient(to bottom, rgba(255,255,255,0.3) 0%,rgba(255,255,255,0.3) 100%),url("/static/images/waffles.jpg");
+    background-size: 100%;
+    background-color: #ffffff;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
 
 #dashboard-question {
     text-align: center;
 }
 
+
 #dashboard-search {
     text-align: center;
+    color: #88B04B;
 }
+
+a#search-recipe-dashboard {
+    color: #664823;
+    text-decoration: none;
+}
+
+
+input{
+    font-family: 'Hind', sans-serif;
+}
+
+input[type="text"]:focus, input[type="text"]:active {
+        -webkit-box-shadow: none;
+        outline: -webkit-focus-ring-color auto 0px;
+
+}
+
+
+.custom-checkbox:checked {
+/*    content: '';
+    position: absolute;
+    left:0; 
+    top: 50%;
+    margin-top:-9px;
+    width: 17px; 
+    height: 17px;
+    border: 1px solid #ddd;*/
+    background: #6A6A6A;
+    /*border-radius: 2px;*/
+    }
 
 #food-fact {
     text-align: center;
 }
 
 #dashboard-content {
-    padding: 120px;
+    padding: 60px;
 
+}
+
+#ingred-bg {
+    /*background-image:linear-gradient(to bottom, rgba(255,255,255,0.5) 100%, rgba(255,255,255,0.5) 100%), url("/static/images/pineapples.jpeg");*/
+    background-image:linear-gradient(to bottom, rgba(255,255,255,0.6) 100%, rgba(255,255,255,0.6) 100%), url("/static/images/prep.jpeg");
+    background-size: 100%;
+    background-color: #F6F7F9;
+    background-position: 720px 35px;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    /*background-position: 0px -250px;*/
 }
 
 
@@ -57,14 +228,15 @@
      border: 1px solid;
      padding-top: 10px;
      padding-bottom: 10px;
+     /*padding-right: 25px;*/
 
 }
 
 .ingredient-box li {
     padding: 5px 0 0 0px;
+    /*background: #ffffff;*/
 
 }
-
 
 
 .delete-button {
@@ -72,9 +244,18 @@
 }
 
 
-
 .upload-form {
   display: none;
+}
+
+#search-bg {
+    /*background-image:linear-gradient(to bottom, rgba(255,255,255,0.5) 100%, rgba(255,255,255,0.5) 100%), url("/static/images/pineapples.jpeg");*/
+    background-image:linear-gradient(to bottom, rgba(255,255,255,0.6) 100%, rgba(255,255,255,0.6) 100%), url("/static/images/caprese.jpeg");
+    background-size: 100%;
+    background-color: #f5f5f5;
+    background-position: 550px 35px;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
 
@@ -103,12 +284,12 @@
 
 #alert-area {
     width: 25%;
-    float: right;
+    float: left;
 }
 
 #search-alerts {
     width: 25%;
-    float: right;
+    float: left;
 }
 
 #search-button-div {
@@ -125,10 +306,7 @@
     text-align: center;
 }
 
-h2 {
-    text-align: center;
-    padding-top: 20px;
-}
+
 
 #initial-load-more {
     text-align: center;
@@ -180,4 +358,8 @@ h2 {
 .add-recipe {
     display: block;
     margin: 0 auto;
+}
+
+.search-footnote {
+    font-size: .75em;
 }

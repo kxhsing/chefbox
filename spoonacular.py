@@ -17,7 +17,7 @@ headers={
   }
 
 
-def get_recipe_api(include_ingredients, diet, cuisines, intolerances, offset):
+def get_recipe_api(include_ingredients, diet, cuisines, intolerances, offset, query):
     """Make GET request to API for recipe searches"""
     payload = {
             'addRecipeInformation': False, 
@@ -27,7 +27,8 @@ def get_recipe_api(include_ingredients, diet, cuisines, intolerances, offset):
             'cuisine': cuisines,
             'intolerances': intolerances,
             'ranking': 1,
-            'offset': offset
+            'offset': offset,
+            'query': query
         }
     # print payload
 
@@ -80,10 +81,10 @@ def process_bulk_recipes(bulk_recipe_results):
     return recipe_results_list
 
 
-def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset):
+def get_recipe_request(include_ingredients, diet, cuisines, intolerances, offset, query):
     """Make recipe search request, get detailed recipe info for each and display results"""
 
-    recipes = get_recipe_api(include_ingredients, diet, cuisines, intolerances, offset)
+    recipes = get_recipe_api(include_ingredients, diet, cuisines, intolerances, offset, query)
 
     # if recipes.status_code != requests.codes.ok: #need 504 error to happen to confirm if this works
     #     return None

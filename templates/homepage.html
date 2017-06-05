@@ -4,11 +4,10 @@
   <title>ChefBox</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
   <link rel="stylesheet" href="/static/styles.css">
+  <link href="https://fonts.googleapis.com/css?family=Alice|Amaranth:400,700|Hind|Kaushan+Script" rel="stylesheet">
 </head>
 
-<body>
-
-    <!-- Show flashed messages -->
+<body id="homepage-bg">
 
   <script src="http://code.jquery.com/jquery.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
@@ -26,6 +25,7 @@
 </form>
 </div>
 
+  <!-- Show flashed messages -->
   {% with messages = get_flashed_messages() %}
       {% for message in messages %}
           <div class="alert alert-warning">{{ message }}</div>
@@ -34,7 +34,12 @@
   
 
 <br>
-
+<div class="row">
+  <div class="col-md-8 offset-md-3">
+    <h1 id="chef-box"><span class="chef">Chef</span><span class="box"> Box</span></h1>
+  </div>
+</div>
+<!-- <img src="/static/avocado.svg" width="43" height="43"> -->
 <div id="sign-up">
 <form action="/register" method="POST">
     <div>

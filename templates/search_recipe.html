@@ -3,7 +3,7 @@
 {% block title %}Search Recipe{% endblock %}
 
 {% block content %}
-
+<body id="search-bg">
 <div class="explanatory-header-text">
     <h2>Search for Recipes</h2>
 </div>
@@ -32,7 +32,7 @@
         <p>Include Ingredients from Inventory:</p>
         <ul id="ingred-list">
           {% for ingredient in user.ingredients %}
-              <li class="search-checkbox"><input type="checkbox" name="search_ingredients" value="{{ ingredient.ingred_name }}" checked> {{ ingredient.ingred_name.title() }}</li>
+              <li class="search-checkbox"><input type="checkbox" class="custom-checkbox" name="search_ingredients" value="{{ ingredient.ingred_name }}" checked> {{ ingredient.ingred_name.title() }}</li>
           {% endfor %}
         </ul>
 
@@ -40,10 +40,14 @@
       <ul id="new-ingred-list">
       </ul>
 
-      {% endif %}<br>
+
+      {% endif %}
+      Keywords (optional)<br>
+      <span class="search-footnote">(e.g., cookies, soup, pan-seared, roasted)</span>
+      <input type="text" name="query"><br><br>
 
           Preferred Cuisine(s)<br>
-          (optional):<br>
+          <span class="search-footnote">(optional):</span><br>
             <ul>
             {% for cuisine in cuisines %}
                 <li class="search-checkbox"><input type="checkbox" name="cuisines" value="{{ cuisine }}"> {{ cuisine.title() }}</li>
