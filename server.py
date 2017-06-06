@@ -18,11 +18,9 @@ from actions import delete_ingredient, add_ingredient, delete_recipe, add_to_boa
 app = Flask(__name__)
 
 # Required to use Flask sessions and the debug toolbar
-app.secret_key = "jd8gakhHdiemvkldov"
+app.secret_key = os.environ["FLASK_SECRET_KEY"]
 
-# Normally, if you use an undefined variable in Jinja2, it fails
-# silently. This is horrible. Fix this so that, instead, it raises an
-# error.
+
 app.jinja_env.undefined = StrictUndefined
 
 UPLOAD_FOLDER = "static/photos/"
