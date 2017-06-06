@@ -17,20 +17,20 @@ Libraries: Flask Uploads, Bcrypt
 
 ## <a name="features"></a>Features
 
-![alt tag]("/static/images/readme/homepage.png")
+![alt tag](/static/images/readme/homepage.png)
 
 Users register to use ChefBox with their email, and passwords are hashed before being stored in the PostgreSQL database.
 Registered users have a personalized dashboard only they have access to once logged in.
 
-![alt tag]("/static/images/readme/dashboard.png")
+![alt tag](/static/images/readme/dashboard.png)
 
 Users can add ingredients they have in their kitchen pantry to their Ingredient Inventory, which will be appended to their ingredient list via AJAX post requests.
 
-![alt tag]("/static/images/readme/ingred.gif")
+![alt tag](/static/images/readme/ingred.gif)
 
 Users can search for recipes that maximize the use of the ingredients in their inventory, any keywords, preferred cuisines, dietary needs, and allergies to the search query.
 
-![alt tag]("/static/images/readme/search.gif")
+![alt tag](/static/images/readme/search.gif)
 
 When the search form is submitted, the app will start making calls to the Spoonacular API, and results will be rendered into recipe cards and displayed in a Masonry-like fashion for users to browse and save to their recipe box.
 
