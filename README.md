@@ -102,11 +102,11 @@ source secrets.sh
 
 Create database 'recipes'.
 ```
-$ createdb recipes
+createdb recipes
 ```
 Create your database tables
 ```
-$ python model.py
+python model.py
 ```
 
 Run the app:
