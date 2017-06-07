@@ -120,5 +120,5 @@ You can now navigate to 'localhost:5000/' to start cooking with ChefBox.
 
 ## <a name="future"></a>Future Features
 * Autocomplete ingredient search feature
-* Feature to generate shareable links of completed recipes (including photos and reviews)
-* Import saved recipe pins from a user's Pinterest account
+* Generate shareable links of completed recipes (including photos and reviews)
+* Import saved recipe pins from a user's Pinterest account (to search through in their Recipe Box)
