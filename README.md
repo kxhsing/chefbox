@@ -47,9 +47,9 @@ All saved recipes are stored in the database which can be accessed by the user i
 
 Once a recipe has been completed, the user can mark it as as "Cooked", which will move it to their Chef Board. 
 
-
 Using the Flask uploads library, ChefBox lets users upload photos and write reviews of completed recipes, all of which can be edited later should the user wish to.
 
+![alt tag](/static/images/readme/board.png)
 
 
 ## <a name="install"></a>Installation
