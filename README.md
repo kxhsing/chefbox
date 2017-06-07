@@ -30,25 +30,23 @@ Users can add ingredients they have in their kitchen pantry to their Ingredient 
 
 Users can search for recipes that maximize the use of the ingredients in their inventory, any keywords, preferred cuisines, dietary needs, and allergies to the search query.
 
-![alt tag](/static/images/readme/search.gif)
+![alt tag](/static/images/readme/search-recipe.gif)
 
 When the search form is submitted, the app will start making calls to the Spoonacular API, and results will be rendered into recipe cards and displayed in a Masonry-like fashion for users to browse and save to their recipe box.
 
-![alt tag]("/static/images/readme/results.png")
+![alt tag](/static/images/readme/results.png)
 
-ChefBox allows users to infinitely scroll for more results using AJAX post requests, which will continuously make calls to the API when the bottom of the window is reached. Recipe results will be continously to the end of the page until a user decides they've found what they're looking for (or when they reach the end of the results). 
-
-![alt tag]("/static/images/readme/results-scroll.gif")
+ChefBox allows users to infinitely scroll for more results using AJAX post requests, which will continuously make calls to the API when the bottom of the window is reached and add more recipe results to the end of the page. 
 
 When a user clicks on the "Save Recipe" button, an AJAX call posts the recipe info to the database under the user's recipes. The recipe card is then hidden and a confirmation message is displayed using jQuery.
 
+
 All saved recipes are stored in the database which can be accessed by the user in later sessions.
 
-![alt tag]("/static/images/readme/recipes.gif")
+![alt tag](/static/images/readme/recipes.png)
 
 Once a recipe has been completed, the user can mark it as as "Cooked", which will move it to their Chef Board. 
 
-![alt tag]("/static/images/readme/cooked.gif")
 
 Using the Flask uploads library, ChefBox lets users upload photos and write reviews of completed recipes, all of which can be edited later should the user wish to.
 
@@ -108,6 +106,8 @@ Create your database tables
 ```
 python model.py
 ```
+
+Create a folder called "photos" within your "static" folder. This is where your uploaded photos of completed recipes will be stored.
 
 Run the app:
 
