@@ -7,6 +7,7 @@ ChefBox is an all-in-one tool for aspiring chefs and home cooks to discover reci
 * [Features](#features)
 * [Installation](#install)
 * [Future Features](#future)
+* [Author](#author)
 
 ## <a name="technologies"></a>Technologies
 
@@ -122,3 +123,13 @@ You can now navigate to 'localhost:5000/' to start cooking with ChefBox.
 * Autocomplete ingredient search feature
 * Generate shareable links of completed recipes (including photos and reviews)
 * Import saved recipe pins from a user's Pinterest account (to search through in their Recipe Box)
+
+
+
+## <a name="author"></a>Author
+Hi! My name is [Karen Hsing](https://www.linkedin.com/in/karenhsing/) and I'm a software engineer. I graduated from Hackbright Academy's Software Engineering Fellowship Program, an engineering bootcamp for women in San Francisco (graduation: April 2017). 
+
+Prior to Hackbright I was an account manager at a marketing agency where I led our marketing team and worked with 15 different clients from the tech, lifestyle, and hospitality industries to create personalized solutions for their different marketing needs, including branding, digital marketing, event sponsorships, and more.
+
+I'm currently seeking a full-time software developer role in the San Francisco Bay Area. Feel free to reach out to me to say hi at kxhsing@gmail.com or connect with me on [LinkedIn](https://www.linkedin.com/in/karenhsing/)
+
