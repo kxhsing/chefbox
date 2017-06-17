@@ -131,5 +131,5 @@ Hi! My name is [Karen Hsing](https://www.linkedin.com/in/karenhsing/) and I'm a 
 
 Prior to Hackbright I was an account manager at a marketing agency where I led our marketing team and worked with 15 different clients from the tech, lifestyle, and hospitality industries to create personalized solutions for their different marketing needs, including branding, digital marketing, event sponsorships, and more.
 
-I'm currently seeking a full-time software developer role in the San Francisco Bay Area. Feel free to reach out to me to say hi at kxhsing@gmail.com or connect with me on [LinkedIn](https://www.linkedin.com/in/karenhsing/)
+I'm currently seeking a full-time software developer role in the San Francisco Bay Area. Feel free to reach out to me to say hi at kxhsing@gmail.com or connect with me on [LinkedIn](https://www.linkedin.com/in/karenhsing/)!
 

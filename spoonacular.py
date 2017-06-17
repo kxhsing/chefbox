@@ -30,7 +30,6 @@ def get_recipe_api(include_ingredients, diet, cuisines, intolerances, offset, qu
             'offset': offset,
             'query': query
         }
-    # print payload
 
     recipes = requests.get(search_recipe_complex, headers=headers, params=payload)
     if recipes.status_code != requests.codes.ok: #need 504 error to happen to confirm if this works
@@ -116,7 +115,7 @@ def get_recipe_info(recipe_id):
     """Make GET requests to API for recipe searches."""
     
     saved_recipe = requests.get(get_recipe_info_endpoint.format(recipe_id), headers=headers)
-    saved_recipe = saved_recipe.json() #dict
+    saved_recipe = saved_recipe.json() 
 
     return saved_recipe
 

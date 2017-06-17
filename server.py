@@ -94,7 +94,6 @@ def login_check():
 @app.route('/logout')
 def logout():
     """Logs out user."""
-    # flash("Log out success!")
     del session["user_id"]
 
     return redirect("/")
@@ -279,7 +278,6 @@ def search_more():
         recipe_results_list = []
         total_results = 0
 
-    # return render_template("recipe_results.html", user=user, recipe_results_list=recipe_results_list, total_results=total_results)
     return jsonify({'recipe_results_list': recipe_results_list, 'total_results': total_results})
 
 
@@ -327,7 +325,6 @@ def upload():
         if request.method == "POST" and "photo" in request.files:
             filename = photos.save(photo)
     except:
-        # flash("Not a valid photo file. Please try again.")
         return jsonify({})
 
     result = upload_photo(user_id, filename, recipe_id)
@@ -359,8 +356,7 @@ def write_review():
 
 
 if __name__ == "__main__":
-    # We have to set debug=True here, since it has to be True at the
-    # point that we invoke the DebugToolbarExtension
+
 
     app.debug = True
     app.jinja_env.auto_reload = app.debug  # make sure templates, etc. are not cached in debug mode

@@ -61,7 +61,6 @@ def add_new_recipe(user_id, recipe_id):
     saved_recipe_source_url = saved_recipe.get('sourceUrl')
     saved_recipe_image_url = saved_recipe.get('image')
     print saved_recipe_image_url
-    #get recipe image?? Design decision
 
     steps = saved_recipe['analyzedInstructions'][0]['steps']
     step_instructions = [] #create list for all instruction steps
@@ -69,8 +68,6 @@ def add_new_recipe(user_id, recipe_id):
     for step in steps:
         if len(step['step']) > 1:
             step_instructions.append(step['step'])
-
-    # print step_instructions
 
     if not Recipe.query.filter(Recipe.url==saved_recipe_source_url).all():
         #Create new recipe for database if does not exist already
@@ -118,7 +115,6 @@ def add_new_recipe(user_id, recipe_id):
     db.session.commit()
 
     return jsonify({})
-
 
 
 def delete_recipe(user_id, recipe_id):
@@ -184,10 +180,4 @@ def create_review(user_id, recipe_id, review):
 
     return jsonify({'review': this_review.review})
 
-
-
-
-
-
-
-
+    
