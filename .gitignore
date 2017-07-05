@@ -8,3 +8,6 @@ reciperesults-parsing.py
 *.json
 static/photos
 *.mov
+tests.py
+actions_tests.py
+spoonacular_tests.py
