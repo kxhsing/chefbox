@@ -112,7 +112,7 @@ def show_user_info(user_id):
     user = User.query.filter(User.user_id==user_id_session).one()
 
     trivia = get_random_food_trivia()
-    print trivia
+    #print trivia
 
     trivia_text = trivia['text']
 

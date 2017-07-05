@@ -183,8 +183,9 @@ def example_data():
     db.session.add_all([karen, jesse, cora, thai_shrimp_pasta])
     db.session.flush()
     thai_shrimp_pasta_id = Recipe.query.filter(Recipe.url=="http://www.tasteofhome.com/Recipes/thai-shrimp-pasta").first().recipe_id
-    
-    karen_thai_pasta = UserRecipe(recipe_id=thai_shrimp_pasta_id, user_id=user_id, cooked=False)
+    karen_id = User.query.filter(User.email=='karen@gmail.com').first().user_id
+
+    karen_thai_pasta = UserRecipe(recipe_id=thai_shrimp_pasta_id, user_id=karen_id, cooked=False)
     db.session.add(karen_thai_pasta)
 
     
