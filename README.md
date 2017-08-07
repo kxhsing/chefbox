@@ -2,6 +2,8 @@
 
 ChefBox is an all-in-one tool for aspiring chefs and home cooks to discover recipes, save memories of their culinary accomplishments, and reduce food waste. ChefBox searches for recipes based on users' available ingredients, personal preferences, and dietary restrictions. Registered users have personalized dashboards where they can add ingredients to their inventory, find new recipes that utilize their ingredients, access saved recipes from previous sessions, and upload photos and reviews of their completed dishes.
 
+[View full video demo.](https://www.youtube.com/watch?v=m9CgrZV5BKg)
+
 ## Table of Contents
 * [Technologies](#technologies)
 * [Features](#features)

@@ -187,7 +187,7 @@ class TestUserIngredRecipeBoard(TestCase):
                             follow_redirects=True
                             )
 
-            self.assertIn("Cooked", result.data)
+            self.assertIn("<button type=\"submit\" class=\"review-recipe btn btn-primary button-to-align\" name=\"recipe_id\" value=\"1\">Cooked</button>", result.data)
             self.assertIn("If you are no longer interested in a recipe, you can \"Remove\" it from your Recipe Box.", result.data)
 
 
